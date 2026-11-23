@@ -1,0 +1,29 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // Match the site's `esnext`/`bundler` resolution so the JSX runtime and React
+    // types resolve to the same declarations the tested components were written against.
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
+    // Required for the `apps/site` component tests: without it, TypeScript
+    // rejects JSX syntax in `.tsx` test files. The runtime transform is done
+    // by `@vitejs/plugin-react` in `vitest.config.js`; this only affects types.
+    "jsx": "react-jsx",
+    "paths": {
+      "shared": ["../shared/src/index.ts"],
+      "discord.js": ["../apps/discordBot/node_modules/discord.js/typings/index.d.mts"],
+      // React lives in the `site` workspace package; map the types to its
+      // installed `@types/*` copies so JSX and component types resolve.
+      "react": ["../apps/site/node_modules/@types/react"],
+      "react/jsx-runtime": ["../apps/site/node_modules/@types/react/jsx-runtime.d.ts"],
+      "react-dom": ["../apps/site/node_modules/@types/react-dom"],
+      "react-dom/client": ["../apps/site/node_modules/@types/react-dom/client.d.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
