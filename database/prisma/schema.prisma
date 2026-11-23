@@ -1,0 +1,10 @@
+// Generates the JavaScript client consumed by `database/src/setup.ts`.
+generator client {
+  provider = "prisma-client-js"
+}
+
+// The URL is intentionally absent: Prisma 7 reads it from
+// `database/prisma.config.ts` (`DATABASE_CONNECTION_STRING`).
+datasource db {
+  provider = "postgresql"
+}

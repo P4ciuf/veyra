@@ -1,0 +1,26 @@
+/// A developer's request to be authorized to publish bots.
+/// Reviewed by staff; `status` tracks the decision and `rejectReason` records
+/// why a request was declined.
+model AuthorizationRequest {
+  id            String @id @default(cuid())
+  discordUserId String
+
+  githubAccount String
+  portfolioLink String?
+
+  status                 AuthorizationRequestStatus @default(PENDING)
+  managedByDiscordUserId String?
+  rejectReason           String?
+
+  user User @relation(fields: [discordUserId], references: [discordId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Lifecycle of an `AuthorizationRequest`.
+enum AuthorizationRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECT
+}

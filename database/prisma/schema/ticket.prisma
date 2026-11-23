@@ -1,0 +1,44 @@
+/// A support ticket backed by a Discord channel.
+model Ticket {
+  id               String @id @default(cuid())
+  discordChannelId String @unique
+
+  discordUserId String
+  type          TicketType
+  reason        String
+  status        TicketStatus @default(PENDING)
+
+  user User @relation(fields: [discordUserId], references: [discordId])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+}
+
+/// Categories used to route support tickets.
+enum TicketType {
+  GENERAL_SUPPORT
+  REPORT_BUG
+  REPORT_USER
+  OTHER
+}
+
+/// Lifecycle of a support ticket.
+enum TicketStatus {
+  PENDING
+  PROGRESS
+  CLOSED
+}
+
+/// A message posted inside a support ticket.
+model TicketMessage {
+  id            String @id @default(cuid())
+  discordUserId String
+
+  content String
+
+  user User @relation(fields: [discordUserId], references: [discordId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}

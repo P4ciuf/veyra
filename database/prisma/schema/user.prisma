@@ -1,0 +1,33 @@
+/// A platform user, optionally linked to a Discord account.
+/// `discordId` is nullable so a record can exist before the Discord link is
+/// established; relations that require a Discord id point at it.
+model User {
+  id        String  @id @default(cuid())
+  discordId String? @unique
+
+  username   String
+  avatarHash String?
+
+  authorizedDeveloper Boolean   @default(false)
+  role                UserRoles @default(USER)
+
+  tickets               Ticket[]
+  ticketMessages        TicketMessage[]
+  reviews               Reviews[]
+  addBotRequests        botAddRequest[]
+  AuthorizationRequests AuthorizationRequest[]
+  warns                 Warn[]                 @relation("warned_user")
+  addWarns              Warn[]                 @relation("warned_by_user")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Platform roles; `ADMIN` and `STAFF` are staff roles, while
+/// `AUTHORIZED_DEVELOPER` grants bot publishing rights.
+enum UserRoles {
+  ADMIN
+  STAFF
+  AUTHORIZED_DEVELOPER
+  USER
+}

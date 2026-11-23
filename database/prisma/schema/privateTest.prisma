@@ -1,0 +1,25 @@
+/// A Discord category that groups private test channels for one owner.
+model PrivateTestCategory {
+  id String @id @default(cuid())
+
+  discordId      String @unique
+  ownerDiscordId String @unique
+
+  channels PrivateTestChannel[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// A private test channel belonging to a `PrivateTestCategory`.
+model PrivateTestChannel {
+  id String @id @default(cuid())
+
+  discordId         String
+  categoryDiscordId String
+
+  category PrivateTestCategory @relation(fields: [categoryDiscordId], references: [discordId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,16 @@
+/// A moderation warning issued by one user against another.
+/// The two `User` relations are named to distinguish the warned user from the
+/// staff member who issued the warning.
+model Warn {
+  id Int @id @default(autoincrement())
+
+  warnedDiscordUserId    String
+  warnAddByDiscordUserId String
+  reason                 String
+
+  warnedUser    User @relation("warned_user", fields: [warnedDiscordUserId], references: [discordId], onDelete: Cascade)
+  warnAddByUser User @relation("warned_by_user", fields: [warnAddByDiscordUserId], references: [discordId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
