@@ -1,0 +1,227 @@
+{
+  "main": {
+    "id": "34dde155434016d4",
+    "type": "split",
+    "children": [
+      {
+        "id": "07b0ecb944c0442a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3c64e80a5d110c44",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vista grafo"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b070a5e82f7fd920",
+    "type": "split",
+    "children": [
+      {
+        "id": "b88141429c5b8c34",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bb08333bfe98c4bb",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Esplora file"
+            }
+          },
+          {
+            "id": "93063fcbe885d3b2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Ricerca"
+            }
+          },
+          {
+            "id": "fd3f29498d980bd3",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Segnalibri"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "3380907ffc990d9d",
+    "type": "split",
+    "children": [
+      {
+        "id": "3b3c85e5fa0e7cc7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "63f4fcc7cf9dc6c1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Riferimenti"
+            }
+          },
+          {
+            "id": "d1c506a4f7c84f28",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Collegamenti in uscita"
+            }
+          },
+          {
+            "id": "c7299477bf3208d4",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etichette"
+            }
+          },
+          {
+            "id": "01d354f4896ececc",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Tutte le proprietà"
+            }
+          },
+          {
+            "id": "bf5cb843d32bbec1",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Struttura"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Apri selettore rapido": false,
+      "graph:Apri vista grafo": false,
+      "canvas:Crea nuova lavagna": false,
+      "daily-notes:Apri nota giornaliera": false,
+      "templates:Inserisci modello": false,
+      "command-palette:Apri riquadro comandi": false,
+      "bases:Crea nuova Base": false
+    }
+  },
+  "active": "3c64e80a5d110c44",
+  "lastOpenFiles": [
+    "shared/dist/utils/logger.js",
+    "shared/dist/utils/logger.d.ts",
+    "shared/dist/utils",
+    "database/prisma/migrations/20261120083712_create_initial_schema/migration.sql",
+    "database/prisma/migrations/migration_lock.toml",
+    "database/prisma/migrations/20261120083712_create_initial_schema",
+    "database/prisma/migrations",
+    "coverage/shared/src/utils/logger.ts.html",
+    "coverage/shared/src/utils/index.html",
+    "coverage/shared/src/utils",
+    "coverage/shared/src/index.ts.html",
+    "coverage/sort-arrow-sprite.png",
+    "coverage/favicon.png",
+    "docs/brand-identity/brand/Screenshot_2026-11-17_003237.png",
+    "tokens.md",
+    "docs/brand-identity/brand/logo.png",
+    "docs/specifications/bot-metadata.md",
+    "docs/brand-identity/layouts/tablet.md",
+    "docs/brand-identity/layouts/mobile.md",
+    "docs/brand-identity/layouts/desktop.md",
+    "docs/brand-identity/components/inputs.md",
+    "docs/brand-identity/components/navigation.md",
+    "docs/brand-identity/components/feedback.md",
+    "docs/brand-identity/components/dialogs.md",
+    "docs/brand-identity/components/buttons.md",
+    "docs/brand-identity/brand/logo-usage.md",
+    "docs/brand-identity/components/badges.md",
+    "docs/brand-identity/components/cards.md",
+    "docs/brand-identity/brand/brand-guidelines.md",
+    "docs/bot-standard/VBS-SPECIFICATION.md",
+    "docs/bot-standard/README.md",
+    "docs/brand-identity/README.md",
+    "docs/brand-identity/accessibility.md",
+    "docs/README.md",
+    "docs/development.md",
+    "docs/ADDING_BOTS.md",
+    "logs/docs/brand-identity/components/navigation.md",
+    "logs/docs/brand-identity/components/inputs.md",
+    "logs/docs/brand-identity/components/feedback.md",
+    "logs/docs/brand-identity/components/dialogs.md"
+  ]
+}

@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.eslintcache
+*.tsbuildinfo
+
+# IDE
+.vscode/*
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# TLS certificates (see ssl/README.md)
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+ssl/*.csr
+ssl/*.srl
+
+# Next
+.next/
+/out/
+next-env.d.ts

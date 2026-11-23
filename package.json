@@ -1,0 +1,66 @@
+{
+  "name": "veyra",
+  "private": true,
+  "description": "Veyra is a free and open-source platform for discovering, testing, and distributing open-source Discord bots through an official Discord server and website",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc -p apps/discordBot --noEmit && tsc -p shared --noEmit && tsc -p tests --noEmit && tsc -p apps/site --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:recreate": "docker compose down && docker compose build --no-cache && docker compose up -d",
+    "clear:win": "powershell -NoProfile -Command \"$ErrorActionPreference='SilentlyContinue'; Get-ChildItem -Path . -Directory -Recurse -Force | Where-Object { $_.Name -in @('node_modules','dist','logs') } | ForEach-Object { Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }\"",
+    "clear": "bash -c \"find . -type d \\( -name node_modules -o -name dist -o -name logs \\) -prune -exec rm -rf {} + 2>/dev/null || true\"",
+    "clear:mac": "find . -type d \\( -name node_modules -o -name dist -o -name logs \\) -prune -exec rm -rf {} + 2>/dev/null || true"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,mts,cts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,jsonc,css}": [
+      "prettier --write"
+    ]
+  },
+  "author": "P4ciuf",
+  "license": "Apache-2.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.18.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@eslint/css": "^2.0.1",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.1.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.6",
+    "@typescript-eslint/eslint-plugin": "^8.72.2",
+    "@typescript-eslint/parser": "^8.72.2",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.7",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "jsdom": "^31.0.1",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  }
+}

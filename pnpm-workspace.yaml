@@ -1,0 +1,17 @@
+packages:
+  - "apps/*"
+  - "shared"
+  - "database"
+injectWorkspacePackages: true
+
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+
+# Security overrides: upstream pins an effect release affected by GHSA-7589-6fvf-x4pw,
+# and the ESLint toolchain resolves a minimatch release affected by GHSA-g3hv-75wg-m249.
+# Both overrides were verified with lint, typecheck, tests and the full build.
+overrides:
+  effect: 3.22.1
+  minimatch: 11.0.1
