@@ -1,0 +1,35 @@
+FROM node:24-alpine AS build
+RUN npm install --global pnpm@12.18.0
+WORKDIR /app
+
+# workspace manifests and tsconfigs (cacheable install layer). The bot declares
+# `database: workspace:*`, so that package's manifest must be present too or the
+# frozen-lockfile install cannot resolve the workspace link.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY apps/discordBot/package.json apps/discordBot/tsconfig.json ./apps/discordBot/
+COPY shared/package.json shared/tsconfig.json ./shared/
+COPY database/package.json database/tsconfig.json database/tsconfig.build.json database/prisma.config.ts ./database/
+
+# Workspace `prepare` scripts are deliberately skipped here: they need the full
+# sources, and building is done explicitly after the source layer is copied.
+RUN pnpm install --frozen-lockfile --filter discord-bot... --ignore-scripts
+
+# sources
+COPY apps/discordBot/src ./apps/discordBot/src
+COPY shared/src ./shared/src
+COPY database/src ./database/src
+COPY database/prisma ./database/prisma
+
+# builds shared and database first, then the bot (pnpm runs `build` in topological
+# order). The bot resolves `shared` types from shared/dist/index.d.ts, so the order matters.
+RUN pnpm --filter discord-bot... run build
+
+RUN pnpm --filter discord-bot --prod deploy /out
+
+FROM node:24-alpine AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --from=build /out ./
+
+CMD ["node", "dist/main.js"]

@@ -1,0 +1,23 @@
+{
+  "name": "discord-bot",
+  "version": "0.1.0",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsx watch --watch-path=src src/main.ts",
+    "start": "node dist/main.js",
+    "build": "tsc",
+    "docker:build": "docker build -f Dockerfile -t veyra-discord-bot ../..",
+    "docker:start": "docker run -d --name veyra-discord-bot --env-file .env veyra-discord-bot"
+  },
+  "dependencies": {
+    "discord.js": "^14.28.1",
+    "dotenv": "^18.0.10",
+    "shared": "workspace:*",
+    "database": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}
