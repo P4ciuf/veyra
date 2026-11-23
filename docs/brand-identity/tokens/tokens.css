@@ -1,0 +1,209 @@
+/* Veyra design tokens derived from tokens/*.json. Most groups are expressed here (palette, type scale, spacing, sizing, radius, shadows, motion, z-layers); layout/breakpoint and font-weight groups are not emitted. No generator script is committed. Update both together. */
+:root {
+  --vy-color-background: #111318;
+  --vy-color-surface: #1B1E27;
+  --vy-color-surface-elevated: #242834;
+  --vy-color-border: #303442;
+  --vy-color-brand-cyan: #05B7F2;
+  --vy-color-brand-blue: #0755F5;
+  --vy-color-primary: #7657F6;
+  --vy-color-brand-violet: #8B22F5;
+  --vy-color-accent: #A78BFA;
+  --vy-color-text-primary: #F4F4F5;
+  --vy-color-text-secondary: #C4C6D0;
+  --vy-color-text-muted: #9295A1;
+  --vy-color-success: #22C55E;
+  --vy-color-warning: #F59E0B;
+  --vy-color-danger: #EF4444;
+  --vy-color-info: #38BDF8;
+  --vy-gradient-brand: linear-gradient(115deg, #05B7F2 0%, #0755F5 38%, #5624F7 68%, #8B22F5 100%);
+  --vy-font-sans: 'Geist Sans', 'Geist', Inter, system-ui, sans-serif;
+  --vy-font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --vy-text-display-size: 3.5rem;
+  --vy-text-display-line: 3.75rem;
+  --vy-text-display-tracking: -0.03em;
+  --vy-text-display-weight: 700;
+  --vy-text-h1-size: 2.25rem;
+  --vy-text-h1-line: 2.75rem;
+  --vy-text-h1-tracking: -0.02em;
+  --vy-text-h1-weight: 700;
+  --vy-text-h2-size: 1.75rem;
+  --vy-text-h2-line: 2.25rem;
+  --vy-text-h2-tracking: -0.015em;
+  --vy-text-h2-weight: 650;
+  --vy-text-h3-size: 1.25rem;
+  --vy-text-h3-line: 1.75rem;
+  --vy-text-h3-tracking: -0.01em;
+  --vy-text-h3-weight: 600;
+  --vy-text-body-size: 1.0rem;
+  --vy-text-body-line: 1.5rem;
+  --vy-text-body-tracking: 0em;
+  --vy-text-body-weight: 400;
+  --vy-text-small-size: 0.875rem;
+  --vy-text-small-line: 1.25rem;
+  --vy-text-small-tracking: 0em;
+  --vy-text-small-weight: 400;
+  --vy-text-caption-size: 0.75rem;
+  --vy-text-caption-line: 1.0rem;
+  --vy-text-caption-tracking: 0.01em;
+  --vy-text-caption-weight: 500;
+  --vy-space-1: 4px;
+  --vy-space-2: 8px;
+  --vy-space-3: 12px;
+  --vy-space-4: 16px;
+  --vy-space-5: 20px;
+  --vy-space-6: 24px;
+  --vy-space-8: 32px;
+  --vy-space-10: 40px;
+  --vy-space-12: 48px;
+  --vy-space-16: 64px;
+  --vy-space-20: 80px;
+  --vy-control-sm: 32px;
+  --vy-control-md: 40px;
+  --vy-control-lg: 48px;
+  --vy-touch-target-min: 44px;
+  --vy-icon-sm: 16px;
+  --vy-icon-md: 20px;
+  --vy-icon-lg: 24px;
+  --vy-focus-ring-width: 2px;
+  --vy-focus-ring-offset: 2px;
+  --vy-avatar-bot: 48px;
+  --vy-avatar-bot-lg: 80px;
+  --vy-radius-sm: 6px;
+  --vy-radius-md: 10px;
+  --vy-radius-lg: 14px;
+  --vy-radius-xl: 20px;
+  --vy-radius-full: 9999px;
+  --vy-motion-instant: 0ms;
+  --vy-motion-fast: 120ms;
+  --vy-motion-base: 200ms;
+  --vy-motion-slow: 320ms;
+  --vy-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --vy-ease-enter: cubic-bezier(0, 0, 0, 1);
+  --vy-ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --vy-z-base: 0;
+  --vy-z-sticky: 100;
+  --vy-z-dropdown: 200;
+  --vy-z-popover: 300;
+  --vy-z-overlay: 400;
+  --vy-z-modal: 500;
+  --vy-z-toast: 600;
+}
+
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  --vy-bg-app: #111318;
+  --vy-bg-surface: #1B1E27;
+  --vy-bg-elevated: #242834;
+  --vy-border-default: #303442;
+  --vy-border-strong: #737889;
+  --vy-text-primary: #F4F4F5;
+  --vy-text-secondary: #C4C6D0;
+  --vy-text-muted: #9295A1;
+  --vy-text-disabled: #6B6F7C;
+  --vy-action-primary: #7657F6;
+  --vy-action-primary-hover: #6A4BEF;
+  --vy-action-primary-active: #5B3FE0;
+  --vy-action-primary-text: #FFFFFF;
+  --vy-action-primary-subtle: rgba(118, 87, 246, 0.16);
+  --vy-accent: #A78BFA;
+  --vy-focus-ring: #A78BFA;
+  --vy-overlay-hover: rgba(255, 255, 255, 0.04);
+  --vy-overlay-active: rgba(255, 255, 255, 0.08);
+  --vy-state-disabled-bg: rgba(255, 255, 255, 0.05);
+  --vy-scrim: rgba(5, 6, 9, 0.72);
+  --vy-success: #22C55E;
+  --vy-success-subtle: rgba(34, 197, 94, 0.12);
+  --vy-success-border: rgba(34, 197, 94, 0.32);
+  --vy-warning: #F59E0B;
+  --vy-warning-subtle: rgba(245, 158, 11, 0.12);
+  --vy-warning-border: rgba(245, 158, 11, 0.32);
+  --vy-danger: #EF4444;
+  --vy-danger-text: #F87171;
+  --vy-danger-subtle: rgba(239, 68, 68, 0.12);
+  --vy-danger-border: rgba(239, 68, 68, 0.32);
+  --vy-danger-solid: #DC2626;
+  --vy-danger-solid-hover: #B91C1C;
+  --vy-danger-solid-active: #991B1B;
+  --vy-info: #38BDF8;
+  --vy-info-subtle: rgba(56, 189, 248, 0.12);
+  --vy-info-border: rgba(56, 189, 248, 0.32);
+  --vy-brand-cyan: #05B7F2;
+  --vy-brand-blue: #0755F5;
+  --vy-brand-violet: #8B22F5;
+  --vy-shadow-0: none;
+  --vy-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.40);
+  --vy-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --vy-shadow-3: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --vy-shadow-4: 0 24px 64px rgba(0, 0, 0, 0.55);
+  --vy-shadow-featured: 0 0 0 1px rgba(118, 87, 246, 0.40), 0 8px 32px rgba(118, 87, 246, 0.18);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --vy-bg-app: #F7F8FA;
+  --vy-bg-surface: #FFFFFF;
+  --vy-bg-elevated: #FFFFFF;
+  --vy-border-default: #D9DCE5;
+  --vy-border-strong: #8A8EA0;
+  --vy-text-primary: #14161C;
+  --vy-text-secondary: #444857;
+  --vy-text-muted: #636775;
+  --vy-text-disabled: #9CA3B8;
+  --vy-action-primary: #5B3FE0;
+  --vy-action-primary-hover: #4F34CC;
+  --vy-action-primary-active: #432BB0;
+  --vy-action-primary-text: #FFFFFF;
+  --vy-action-primary-subtle: rgba(91, 63, 224, 0.10);
+  --vy-accent: #6D4AE8;
+  --vy-focus-ring: #5B3FE0;
+  --vy-overlay-hover: rgba(20, 22, 28, 0.04);
+  --vy-overlay-active: rgba(20, 22, 28, 0.08);
+  --vy-state-disabled-bg: rgba(20, 22, 28, 0.05);
+  --vy-scrim: rgba(17, 19, 24, 0.48);
+  --vy-success: #15803D;
+  --vy-success-subtle: rgba(21, 128, 61, 0.10);
+  --vy-success-border: rgba(21, 128, 61, 0.35);
+  --vy-warning: #B45309;
+  --vy-warning-subtle: rgba(180, 83, 9, 0.10);
+  --vy-warning-border: rgba(180, 83, 9, 0.35);
+  --vy-danger: #DC2626;
+  --vy-danger-text: #B91C1C;
+  --vy-danger-subtle: rgba(220, 38, 38, 0.08);
+  --vy-danger-border: rgba(220, 38, 38, 0.35);
+  --vy-danger-solid: #DC2626;
+  --vy-danger-solid-hover: #B91C1C;
+  --vy-danger-solid-active: #991B1B;
+  --vy-info: #0369A1;
+  --vy-info-subtle: rgba(3, 105, 161, 0.08);
+  --vy-info-border: rgba(3, 105, 161, 0.35);
+  --vy-brand-cyan: #05B7F2;
+  --vy-brand-blue: #0755F5;
+  --vy-brand-violet: #8B22F5;
+  --vy-shadow-0: none;
+  --vy-shadow-1: 0 1px 2px rgba(20, 22, 28, 0.06), 0 1px 3px rgba(20, 22, 28, 0.08);
+  --vy-shadow-2: 0 4px 12px rgba(20, 22, 28, 0.10);
+  --vy-shadow-3: 0 12px 32px rgba(20, 22, 28, 0.14);
+  --vy-shadow-4: 0 24px 64px rgba(20, 22, 28, 0.20);
+  --vy-shadow-featured: 0 0 0 1px rgba(91, 63, 224, 0.35), 0 8px 32px rgba(91, 63, 224, 0.14);
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --vy-text-display-size: 2.75rem; --vy-text-display-line: 3.25rem;
+    --vy-text-h1-size: 2rem; --vy-text-h1-line: 2.5rem;
+    --vy-text-h2-size: 1.625rem; --vy-text-h2-line: 2rem;
+  }
+}
+@media (max-width: 639px) {
+  :root {
+    --vy-text-display-size: 2.25rem; --vy-text-display-line: 2.75rem;
+    --vy-text-h1-size: 1.75rem; --vy-text-h1-line: 2.25rem;
+    --vy-text-h2-size: 1.5rem; --vy-text-h2-line: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --vy-motion-fast: 0ms; --vy-motion-base: 0ms; --vy-motion-slow: 0ms; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,39 @@
+{
+  "duration": {
+    "motion-instant": {
+      "value": "0ms",
+      "description": "Reduced-motion fallback."
+    },
+    "motion-fast": {
+      "value": "120ms",
+      "description": "Hover, press, focus color changes."
+    },
+    "motion-base": {
+      "value": "200ms",
+      "description": "Dropdowns, tooltips, switches, accordions."
+    },
+    "motion-slow": {
+      "value": "320ms",
+      "description": "Modals, drawers, toasts entering."
+    }
+  },
+  "easing": {
+    "ease-standard": {
+      "value": "cubic-bezier(0.2, 0, 0, 1)",
+      "description": "Default."
+    },
+    "ease-enter": {
+      "value": "cubic-bezier(0, 0, 0, 1)",
+      "description": "Elements entering."
+    },
+    "ease-exit": {
+      "value": "cubic-bezier(0.3, 0, 1, 1)",
+      "description": "Elements leaving."
+    }
+  },
+  "rules": [
+    "Animate only opacity, transform and color properties.",
+    "Under prefers-reduced-motion: reduce, all durations resolve to motion-instant, spinners switch to a static or pulsing-opacity indicator, and skeleton shimmer is disabled.",
+    "Never use motion as the only means of conveying state."
+  ]
+}

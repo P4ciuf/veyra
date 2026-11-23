@@ -1,0 +1,167 @@
+{
+  "font-families": {
+    "sans": {
+      "value": "'Geist Sans', 'Geist', Inter, system-ui, sans-serif",
+      "description": "Primary UI font. Fallback chain: Inter, system-ui, sans-serif."
+    },
+    "mono": {
+      "value": "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+      "description": "Code, tokens, IDs, commands, version numbers."
+    }
+  },
+  "font-weights": {
+    "regular": {
+      "value": 400,
+      "description": "Body, Small."
+    },
+    "medium": {
+      "value": 500,
+      "description": "Caption, labels, buttons."
+    },
+    "semibold": {
+      "value": 600,
+      "description": "H3, emphasis."
+    },
+    "heading-2": {
+      "value": 650,
+      "description": "H2. Requires variable font; falls back to 600 where unsupported."
+    },
+    "bold": {
+      "value": 700,
+      "description": "Display, H1."
+    }
+  },
+  "scale": {
+    "display": {
+      "font-family": "sans",
+      "size-px": 56,
+      "size-rem": 3.5,
+      "line-height-px": 60,
+      "letter-spacing-em": -0.03,
+      "weight": 700,
+      "responsive": {
+        "desktop-px": 56,
+        "tablet-px": 44,
+        "mobile-px": 36
+      },
+      "description": "Marketing hero headlines only. One per page."
+    },
+    "h1": {
+      "font-family": "sans",
+      "size-px": 36,
+      "size-rem": 2.25,
+      "line-height-px": 44,
+      "letter-spacing-em": -0.02,
+      "weight": 700,
+      "responsive": {
+        "desktop-px": 36,
+        "tablet-px": 32,
+        "mobile-px": 28
+      },
+      "description": "Page titles."
+    },
+    "h2": {
+      "font-family": "sans",
+      "size-px": 28,
+      "size-rem": 1.75,
+      "line-height-px": 36,
+      "letter-spacing-em": -0.015,
+      "weight": 650,
+      "responsive": {
+        "desktop-px": 28,
+        "tablet-px": 26,
+        "mobile-px": 24
+      },
+      "description": "Section titles."
+    },
+    "h3": {
+      "font-family": "sans",
+      "size-px": 20,
+      "size-rem": 1.25,
+      "line-height-px": 28,
+      "letter-spacing-em": -0.01,
+      "weight": 600,
+      "responsive": {
+        "desktop-px": 20,
+        "tablet-px": 20,
+        "mobile-px": 20
+      },
+      "description": "Card titles, dialog titles, subsections."
+    },
+    "body": {
+      "font-family": "sans",
+      "size-px": 16,
+      "size-rem": 1.0,
+      "line-height-px": 24,
+      "letter-spacing-em": 0,
+      "weight": 400,
+      "responsive": {
+        "desktop-px": 16,
+        "tablet-px": 16,
+        "mobile-px": 16
+      },
+      "description": "Default reading text."
+    },
+    "small": {
+      "font-family": "sans",
+      "size-px": 14,
+      "size-rem": 0.875,
+      "line-height-px": 20,
+      "letter-spacing-em": 0,
+      "weight": 400,
+      "responsive": {
+        "desktop-px": 14,
+        "tablet-px": 14,
+        "mobile-px": 14
+      },
+      "description": "Secondary text, table cells, form help."
+    },
+    "caption": {
+      "font-family": "sans",
+      "size-px": 12,
+      "size-rem": 0.75,
+      "line-height-px": 16,
+      "letter-spacing-em": 0.01,
+      "weight": 500,
+      "responsive": {
+        "desktop-px": 12,
+        "tablet-px": 12,
+        "mobile-px": 12
+      },
+      "description": "Badges, metadata, timestamps, helper labels."
+    }
+  },
+  "supporting-styles": {
+    "label": {
+      "font-family": "sans",
+      "size-px": 14,
+      "line-height-px": 20,
+      "letter-spacing-em": 0,
+      "weight": 500,
+      "description": "Form labels, buttons, tabs, menu items (Small size at weight 500)."
+    },
+    "code": {
+      "font-family": "mono",
+      "size-px": 14,
+      "line-height-px": 20,
+      "letter-spacing-em": 0,
+      "weight": 400,
+      "description": "Inline and block code (Small size, Geist Mono)."
+    },
+    "code-caption": {
+      "font-family": "mono",
+      "size-px": 12,
+      "line-height-px": 16,
+      "letter-spacing-em": 0,
+      "weight": 500,
+      "description": "Counts, versions and IDs in metadata (Caption size, Geist Mono)."
+    }
+  },
+  "rules": {
+    "max-line-length-ch": 75,
+    "minimum-body-size-px": 16,
+    "minimum-text-size-px": 12,
+    "text-wrap-headings": "balance",
+    "font-display": "swap"
+  }
+}

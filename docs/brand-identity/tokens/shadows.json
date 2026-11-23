@@ -1,0 +1,77 @@
+{
+  "elevation": {
+    "dark": {
+      "shadow-0": {
+        "value": "none",
+        "description": "Flat: page background content."
+      },
+      "shadow-1": {
+        "value": "0 1px 2px rgba(0, 0, 0, 0.40)",
+        "description": "Raised: cards on hover, sticky navbar."
+      },
+      "shadow-2": {
+        "value": "0 4px 12px rgba(0, 0, 0, 0.35)",
+        "description": "Dropdowns, tooltips, popovers."
+      },
+      "shadow-3": {
+        "value": "0 12px 32px rgba(0, 0, 0, 0.45)",
+        "description": "Toasts, floating panels."
+      },
+      "shadow-4": {
+        "value": "0 24px 64px rgba(0, 0, 0, 0.55)",
+        "description": "Modals and dialogs."
+      },
+      "shadow-featured": {
+        "value": "0 0 0 1px rgba(118, 87, 246, 0.40), 0 8px 32px rgba(118, 87, 246, 0.18)",
+        "description": "Featured card emphasis. Use sparingly."
+      }
+    },
+    "light": {
+      "shadow-0": {
+        "value": "none",
+        "description": "Flat."
+      },
+      "shadow-1": {
+        "value": "0 1px 2px rgba(20, 22, 28, 0.06), 0 1px 3px rgba(20, 22, 28, 0.08)",
+        "description": "Raised."
+      },
+      "shadow-2": {
+        "value": "0 4px 12px rgba(20, 22, 28, 0.10)",
+        "description": "Dropdowns, tooltips, popovers."
+      },
+      "shadow-3": {
+        "value": "0 12px 32px rgba(20, 22, 28, 0.14)",
+        "description": "Toasts, floating panels."
+      },
+      "shadow-4": {
+        "value": "0 24px 64px rgba(20, 22, 28, 0.20)",
+        "description": "Modals and dialogs."
+      },
+      "shadow-featured": {
+        "value": "0 0 0 1px rgba(91, 63, 224, 0.35), 0 8px 32px rgba(91, 63, 224, 0.14)",
+        "description": "Featured card emphasis."
+      }
+    }
+  },
+  "borders": {
+    "border-width-default": {
+      "value": "1px",
+      "description": "Default border."
+    },
+    "border-width-emphasis": {
+      "value": "2px",
+      "description": "Selected/error emphasis; never a replacement for focus ring."
+    }
+  },
+  "focus": {
+    "focus-ring": {
+      "value": "0 0 0 2px var(--vy-bg-app), 0 0 0 4px var(--vy-focus-ring)",
+      "description": "Box-shadow focus-visible ring (2px gap + 2px ring). Prefer outline where possible; use this when parent has overflow hidden or radius must be followed."
+    },
+    "focus-outline": {
+      "value": "2px solid var(--vy-focus-ring)",
+      "description": "Standard outline; pair with outline-offset: 2px."
+    }
+  },
+  "usage-rule": "Shadows alone do not convey elevation on dark backgrounds. Elevated surfaces also use the lighter bg-elevated color and, where needed, border-default."
+}

@@ -1,0 +1,26 @@
+{
+  "standard": {
+    "name": "Veyra Bot Standard",
+    "version": "1.0.0"
+  },
+  "bot": {
+    "name": "Your Bot Name",
+    "description": "A clear description of what your bot does.",
+    "developer": "Your Name or Organization",
+    "prefix": "!",
+    "activity": {
+      "type": "Playing",
+      "text": "Taken by Veyra"
+    }
+  },
+  "features": {
+    "example_feature": true
+  },
+  "links": {
+    "veyra_website": "https://",
+    "veyra_discord": "https://"
+  },
+  "logging": {
+    "level": "info"
+  }
+}

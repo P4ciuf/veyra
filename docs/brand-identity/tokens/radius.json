@@ -1,0 +1,25 @@
+{
+  "scale": {
+    "radius-sm": {
+      "value": 6,
+      "description": "px. Badges, checkboxes, small chips, tooltips."
+    },
+    "radius-md": {
+      "value": 10,
+      "description": "px. Buttons, inputs, selects, dropdown items, alerts."
+    },
+    "radius-lg": {
+      "value": 14,
+      "description": "px. Cards, popovers, dropdown menus, toasts."
+    },
+    "radius-xl": {
+      "value": 20,
+      "description": "px. Modals, featured cards, large panels."
+    },
+    "radius-full": {
+      "value": 9999,
+      "description": "px. Pills, switches, avatars, spinners, pagination dots."
+    }
+  },
+  "nesting-rule": "An inner element's radius should be the parent radius minus the padding between them, never smaller than radius-sm."
+}

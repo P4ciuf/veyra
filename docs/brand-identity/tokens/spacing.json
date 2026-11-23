@@ -1,0 +1,225 @@
+{
+  "base-unit-px": 4,
+  "scale": {
+    "space-1": {
+      "value": 4,
+      "description": "4px (1 x 4px base)."
+    },
+    "space-2": {
+      "value": 8,
+      "description": "8px (2 x 4px base)."
+    },
+    "space-3": {
+      "value": 12,
+      "description": "12px (3 x 4px base)."
+    },
+    "space-4": {
+      "value": 16,
+      "description": "16px (4 x 4px base)."
+    },
+    "space-5": {
+      "value": 20,
+      "description": "20px (5 x 4px base)."
+    },
+    "space-6": {
+      "value": 24,
+      "description": "24px (6 x 4px base)."
+    },
+    "space-8": {
+      "value": 32,
+      "description": "32px (8 x 4px base)."
+    },
+    "space-10": {
+      "value": 40,
+      "description": "40px (10 x 4px base)."
+    },
+    "space-12": {
+      "value": 48,
+      "description": "48px (12 x 4px base)."
+    },
+    "space-16": {
+      "value": 64,
+      "description": "64px (16 x 4px base)."
+    },
+    "space-20": {
+      "value": 80,
+      "description": "80px (20 x 4px base)."
+    }
+  },
+  "sizing": {
+    "control-sm": {
+      "value": 32,
+      "description": "Small control height (dense tables, toolbars). Below touch minimum: desktop only."
+    },
+    "control-md": {
+      "value": 40,
+      "description": "Default control height."
+    },
+    "control-lg": {
+      "value": 48,
+      "description": "Large control height; default on mobile."
+    },
+    "touch-target-min": {
+      "value": 44,
+      "description": "Minimum interactive target on touch devices."
+    },
+    "icon-sm": {
+      "value": 16,
+      "description": "Inline icons."
+    },
+    "icon-md": {
+      "value": 20,
+      "description": "Default icons."
+    },
+    "icon-lg": {
+      "value": 24,
+      "description": "Large icons."
+    },
+    "focus-ring-width": {
+      "value": 2,
+      "description": "Focus-visible ring thickness."
+    },
+    "focus-ring-offset": {
+      "value": 2,
+      "description": "Gap between element and focus ring."
+    },
+    "avatar-bot": {
+      "value": 48,
+      "description": "Bot icon size in Bot Card."
+    },
+    "avatar-bot-lg": {
+      "value": 80,
+      "description": "Bot icon on bot detail page."
+    }
+  },
+  "layout": {
+    "breakpoints": {
+      "mobile-max": {
+        "value": 639,
+        "description": "Mobile: 0-639px."
+      },
+      "tablet-min": {
+        "value": 640,
+        "description": "Tablet: 640-1023px."
+      },
+      "desktop-min": {
+        "value": 1024,
+        "description": "Desktop: 1024px and up."
+      },
+      "wide-min": {
+        "value": 1280,
+        "description": "Wide desktop: 1280px and up."
+      }
+    },
+    "container": {
+      "mobile": {
+        "value": "100%",
+        "description": "Fluid with gutters."
+      },
+      "tablet": {
+        "value": "100%",
+        "description": "Fluid with gutters, max 720px for reading content."
+      },
+      "desktop": {
+        "value": 1200,
+        "description": "Max content width, px."
+      },
+      "wide": {
+        "value": 1280,
+        "description": "Max content width on wide screens, px."
+      },
+      "reading": {
+        "value": 720,
+        "description": "Max width for documentation prose."
+      }
+    },
+    "gutter": {
+      "mobile": {
+        "value": 16,
+        "description": "Page side padding, px."
+      },
+      "tablet": {
+        "value": 24,
+        "description": "Page side padding, px."
+      },
+      "desktop": {
+        "value": 32,
+        "description": "Page side padding, px."
+      }
+    },
+    "grid": {
+      "mobile-columns": {
+        "value": 4,
+        "description": "Columns."
+      },
+      "tablet-columns": {
+        "value": 8,
+        "description": "Columns."
+      },
+      "desktop-columns": {
+        "value": 12,
+        "description": "Columns."
+      },
+      "gap-mobile": {
+        "value": 16,
+        "description": "Column gap, px."
+      },
+      "gap-tablet": {
+        "value": 24,
+        "description": "Column gap, px."
+      },
+      "gap-desktop": {
+        "value": 24,
+        "description": "Column gap, px."
+      }
+    },
+    "sidebar": {
+      "width-expanded": {
+        "value": 256,
+        "description": "Dashboard sidebar, px."
+      },
+      "width-collapsed": {
+        "value": 72,
+        "description": "Icon-only sidebar, px."
+      },
+      "navbar-height-desktop": {
+        "value": 64,
+        "description": "px."
+      },
+      "navbar-height-mobile": {
+        "value": 56,
+        "description": "px."
+      }
+    }
+  },
+  "layers": {
+    "base": {
+      "value": 0,
+      "description": "Default flow."
+    },
+    "sticky": {
+      "value": 100,
+      "description": "Sticky navbar, table headers."
+    },
+    "dropdown": {
+      "value": 200,
+      "description": "Dropdown menus, selects."
+    },
+    "popover": {
+      "value": 300,
+      "description": "Popovers, tooltips."
+    },
+    "overlay": {
+      "value": 400,
+      "description": "Modal scrim."
+    },
+    "modal": {
+      "value": 500,
+      "description": "Dialogs, drawers."
+    },
+    "toast": {
+      "value": 600,
+      "description": "Toasts above everything."
+    }
+  }
+}

@@ -1,0 +1,439 @@
+{
+  "$schema-note": "Veyra color tokens. 'palette' holds raw values; 'themes' holds semantic tokens consumed by components. Components must reference semantic tokens, never raw hex.",
+  "palette": {
+    "mandatory": {
+      "background": {
+        "value": "#111318",
+        "description": "Main application background (dark theme). Mandatory."
+      },
+      "surface": {
+        "value": "#1B1E27",
+        "description": "Cards, panels, menus and surfaces. Mandatory."
+      },
+      "surface-elevated": {
+        "value": "#242834",
+        "description": "Dialogs, popovers and elevated elements. Mandatory."
+      },
+      "border": {
+        "value": "#303442",
+        "description": "Borders and dividers. Mandatory. Decorative contrast only (1.34:1 on surface); use border-strong for control boundaries."
+      },
+      "brand-cyan": {
+        "value": "#05B7F2",
+        "description": "Cyan brand accent. Mandatory."
+      },
+      "brand-blue": {
+        "value": "#0755F5",
+        "description": "Blue brand accent. Mandatory."
+      },
+      "primary": {
+        "value": "#7657F6",
+        "description": "Primary actions and interactive elements. Mandatory."
+      },
+      "brand-violet": {
+        "value": "#8B22F5",
+        "description": "Violet brand accent. Mandatory."
+      },
+      "accent": {
+        "value": "#A78BFA",
+        "description": "Secondary highlights, links and focus rings on dark. Mandatory."
+      },
+      "text-primary": {
+        "value": "#F4F4F5",
+        "description": "Headings and primary body text on dark. Mandatory."
+      },
+      "text-secondary": {
+        "value": "#C4C6D0",
+        "description": "Secondary text on dark. Mandatory."
+      },
+      "text-muted": {
+        "value": "#9295A1",
+        "description": "Muted text, placeholders and metadata on dark. Mandatory."
+      },
+      "success": {
+        "value": "#22C55E",
+        "description": "Success semantic color. Mandatory."
+      },
+      "warning": {
+        "value": "#F59E0B",
+        "description": "Warning semantic color. Mandatory."
+      },
+      "danger": {
+        "value": "#EF4444",
+        "description": "Danger semantic color (icons, borders, indicators). Mandatory."
+      },
+      "info": {
+        "value": "#38BDF8",
+        "description": "Info semantic color. Mandatory."
+      }
+    },
+    "gradient": {
+      "brand-gradient": {
+        "value": "linear-gradient(115deg, #05B7F2 0%, #0755F5 38%, #5624F7 68%, #8B22F5 100%)",
+        "description": "Official digital brand gradient. Decorative use only: logo surroundings, hero emphasis, Featured card accents. Never on body text, form controls or Primary buttons."
+      }
+    },
+    "supplemental": {
+      "border-strong-dark": {
+        "value": "#737889",
+        "description": "Control boundaries on dark (WCAG 1.4.11). 3.79:1 on Surface, 3.34:1 on Surface Elevated."
+      },
+      "primary-hover-dark": {
+        "value": "#6A4BEF",
+        "description": "Primary hover (darker so white label stays above 4.5:1; 5.43:1)."
+      },
+      "primary-active-dark": {
+        "value": "#5B3FE0",
+        "description": "Primary pressed (6.50:1 with white label)."
+      },
+      "on-primary": {
+        "value": "#FFFFFF",
+        "description": "Label/icon color on Primary fills. 4.70:1 on #7657F6. Do not use Text Primary (#F4F4F5, 4.28:1) on Primary."
+      },
+      "danger-solid": {
+        "value": "#DC2626",
+        "description": "Solid destructive fills. 4.83:1 with white label (Danger #EF4444 only reaches 3.76:1)."
+      },
+      "danger-solid-hover": {
+        "value": "#B91C1C",
+        "description": "Destructive hover (6.47:1 with white)."
+      },
+      "danger-solid-active": {
+        "value": "#991B1B",
+        "description": "Destructive pressed."
+      },
+      "danger-text-dark": {
+        "value": "#F87171",
+        "description": "Danger text on dark surfaces. 6.02:1 on Surface; Danger #EF4444 gives 4.42:1."
+      },
+      "disabled-text-dark": {
+        "value": "#6B6F7C",
+        "description": "Disabled text on dark. Exempt from contrast requirements but remains legible."
+      },
+      "gradient-mid-stop": {
+        "value": "#5624F7",
+        "description": "Third gradient stop. Exists only inside brand-gradient; not a standalone UI color."
+      }
+    }
+  },
+  "themes": {
+    "dark": {
+      "$description": "Primary theme. Dark-first.",
+      "bg-app": {
+        "value": "#111318",
+        "description": "Page/application background."
+      },
+      "bg-surface": {
+        "value": "#1B1E27",
+        "description": "Cards, panels, sidebar, navbar, inputs."
+      },
+      "bg-elevated": {
+        "value": "#242834",
+        "description": "Dialogs, popovers, dropdowns, tooltips, toasts."
+      },
+      "border-default": {
+        "value": "#303442",
+        "description": "Dividers and decorative card borders."
+      },
+      "border-strong": {
+        "value": "#737889",
+        "description": "Input, checkbox, switch-off and other control boundaries."
+      },
+      "text-primary": {
+        "value": "#F4F4F5",
+        "description": "Headings and primary text."
+      },
+      "text-secondary": {
+        "value": "#C4C6D0",
+        "description": "Supporting text."
+      },
+      "text-muted": {
+        "value": "#9295A1",
+        "description": "Metadata, placeholders, captions."
+      },
+      "text-disabled": {
+        "value": "#6B6F7C",
+        "description": "Disabled text."
+      },
+      "action-primary": {
+        "value": "#7657F6",
+        "description": "Primary fills, selected indicators, switch-on, checked checkbox."
+      },
+      "action-primary-hover": {
+        "value": "#6A4BEF",
+        "description": "Primary hover."
+      },
+      "action-primary-active": {
+        "value": "#5B3FE0",
+        "description": "Primary pressed."
+      },
+      "action-primary-text": {
+        "value": "#FFFFFF",
+        "description": "Text/icon on primary fills."
+      },
+      "action-primary-subtle": {
+        "value": "rgba(118, 87, 246, 0.16)",
+        "description": "Tinted background for selected rows, active nav items, Primary-tinted badges."
+      },
+      "accent": {
+        "value": "#A78BFA",
+        "description": "Links, highlights, selected text accents."
+      },
+      "focus-ring": {
+        "value": "#A78BFA",
+        "description": "Focus-visible outline color."
+      },
+      "overlay-hover": {
+        "value": "rgba(255, 255, 255, 0.04)",
+        "description": "Hover overlay on any surface."
+      },
+      "overlay-active": {
+        "value": "rgba(255, 255, 255, 0.08)",
+        "description": "Pressed overlay on any surface."
+      },
+      "state-disabled-bg": {
+        "value": "rgba(255, 255, 255, 0.05)",
+        "description": "Disabled control background."
+      },
+      "scrim": {
+        "value": "rgba(5, 6, 9, 0.72)",
+        "description": "Modal backdrop."
+      },
+      "success": {
+        "value": "#22C55E",
+        "description": "Success icons, borders, text."
+      },
+      "success-subtle": {
+        "value": "rgba(34, 197, 94, 0.12)",
+        "description": "Success background tint."
+      },
+      "success-border": {
+        "value": "rgba(34, 197, 94, 0.32)",
+        "description": "Success border."
+      },
+      "warning": {
+        "value": "#F59E0B",
+        "description": "Warning icons, borders, text."
+      },
+      "warning-subtle": {
+        "value": "rgba(245, 158, 11, 0.12)",
+        "description": "Warning background tint."
+      },
+      "warning-border": {
+        "value": "rgba(245, 158, 11, 0.32)",
+        "description": "Warning border."
+      },
+      "danger": {
+        "value": "#EF4444",
+        "description": "Danger icons and borders."
+      },
+      "danger-text": {
+        "value": "#F87171",
+        "description": "Danger text."
+      },
+      "danger-subtle": {
+        "value": "rgba(239, 68, 68, 0.12)",
+        "description": "Danger background tint."
+      },
+      "danger-border": {
+        "value": "rgba(239, 68, 68, 0.32)",
+        "description": "Danger border."
+      },
+      "danger-solid": {
+        "value": "#DC2626",
+        "description": "Destructive button fill."
+      },
+      "danger-solid-hover": {
+        "value": "#B91C1C",
+        "description": "Destructive hover."
+      },
+      "danger-solid-active": {
+        "value": "#991B1B",
+        "description": "Destructive pressed."
+      },
+      "info": {
+        "value": "#38BDF8",
+        "description": "Info icons, borders, text."
+      },
+      "info-subtle": {
+        "value": "rgba(56, 189, 248, 0.12)",
+        "description": "Info background tint."
+      },
+      "info-border": {
+        "value": "rgba(56, 189, 248, 0.32)",
+        "description": "Info border."
+      },
+      "brand-cyan": {
+        "value": "#05B7F2",
+        "description": "Brand accent."
+      },
+      "brand-blue": {
+        "value": "#0755F5",
+        "description": "Brand accent."
+      },
+      "brand-violet": {
+        "value": "#8B22F5",
+        "description": "Brand accent."
+      }
+    },
+    "light": {
+      "$description": "Optional theme with independently designed tokens (not an inversion of dark). Warm-neutral cool-white canvas, white cards separated by borders and soft shadows, deeper brand violet for AA contrast.",
+      "bg-app": {
+        "value": "#F7F8FA",
+        "description": "Page/application background."
+      },
+      "bg-surface": {
+        "value": "#FFFFFF",
+        "description": "Cards, panels, sidebar, navbar, inputs."
+      },
+      "bg-elevated": {
+        "value": "#FFFFFF",
+        "description": "Dialogs, popovers; separated from content by shadow-3/4."
+      },
+      "border-default": {
+        "value": "#D9DCE5",
+        "description": "Dividers and card borders."
+      },
+      "border-strong": {
+        "value": "#8A8EA0",
+        "description": "Control boundaries. 3.25:1 on white, 3.06:1 on bg-app."
+      },
+      "text-primary": {
+        "value": "#14161C",
+        "description": "Headings and primary text. 17.0:1 on bg-app."
+      },
+      "text-secondary": {
+        "value": "#444857",
+        "description": "Supporting text. 9.09:1 on white."
+      },
+      "text-muted": {
+        "value": "#636775",
+        "description": "Metadata, placeholders. 5.63:1 on white."
+      },
+      "text-disabled": {
+        "value": "#9CA3B8",
+        "description": "Disabled text."
+      },
+      "action-primary": {
+        "value": "#5B3FE0",
+        "description": "Primary fills. 6.50:1 with white label."
+      },
+      "action-primary-hover": {
+        "value": "#4F34CC",
+        "description": "Primary hover."
+      },
+      "action-primary-active": {
+        "value": "#432BB0",
+        "description": "Primary pressed."
+      },
+      "action-primary-text": {
+        "value": "#FFFFFF",
+        "description": "Text/icon on primary fills."
+      },
+      "action-primary-subtle": {
+        "value": "rgba(91, 63, 224, 0.10)",
+        "description": "Tinted selected background."
+      },
+      "accent": {
+        "value": "#6D4AE8",
+        "description": "Links and highlights. 5.53:1 on white."
+      },
+      "focus-ring": {
+        "value": "#5B3FE0",
+        "description": "Focus-visible outline color."
+      },
+      "overlay-hover": {
+        "value": "rgba(20, 22, 28, 0.04)",
+        "description": "Hover overlay."
+      },
+      "overlay-active": {
+        "value": "rgba(20, 22, 28, 0.08)",
+        "description": "Pressed overlay."
+      },
+      "state-disabled-bg": {
+        "value": "rgba(20, 22, 28, 0.05)",
+        "description": "Disabled control background."
+      },
+      "scrim": {
+        "value": "rgba(17, 19, 24, 0.48)",
+        "description": "Modal backdrop."
+      },
+      "success": {
+        "value": "#15803D",
+        "description": "Success text/icons. 5.02:1 on white."
+      },
+      "success-subtle": {
+        "value": "rgba(21, 128, 61, 0.10)",
+        "description": "Success tint."
+      },
+      "success-border": {
+        "value": "rgba(21, 128, 61, 0.35)",
+        "description": "Success border."
+      },
+      "warning": {
+        "value": "#B45309",
+        "description": "Warning text/icons. 5.02:1 on white."
+      },
+      "warning-subtle": {
+        "value": "rgba(180, 83, 9, 0.10)",
+        "description": "Warning tint."
+      },
+      "warning-border": {
+        "value": "rgba(180, 83, 9, 0.35)",
+        "description": "Warning border."
+      },
+      "danger": {
+        "value": "#DC2626",
+        "description": "Danger icons and borders. 4.83:1 on white."
+      },
+      "danger-text": {
+        "value": "#B91C1C",
+        "description": "Danger text. 6.47:1 on white."
+      },
+      "danger-subtle": {
+        "value": "rgba(220, 38, 38, 0.08)",
+        "description": "Danger tint."
+      },
+      "danger-border": {
+        "value": "rgba(220, 38, 38, 0.35)",
+        "description": "Danger border."
+      },
+      "danger-solid": {
+        "value": "#DC2626",
+        "description": "Destructive button fill."
+      },
+      "danger-solid-hover": {
+        "value": "#B91C1C",
+        "description": "Destructive hover."
+      },
+      "danger-solid-active": {
+        "value": "#991B1B",
+        "description": "Destructive pressed."
+      },
+      "info": {
+        "value": "#0369A1",
+        "description": "Info text/icons. 5.93:1 on white."
+      },
+      "info-subtle": {
+        "value": "rgba(3, 105, 161, 0.08)",
+        "description": "Info tint."
+      },
+      "info-border": {
+        "value": "rgba(3, 105, 161, 0.35)",
+        "description": "Info border."
+      },
+      "brand-cyan": {
+        "value": "#05B7F2",
+        "description": "Brand accent (decorative only on light)."
+      },
+      "brand-blue": {
+        "value": "#0755F5",
+        "description": "Brand accent."
+      },
+      "brand-violet": {
+        "value": "#8B22F5",
+        "description": "Brand accent."
+      }
+    }
+  }
+}
