@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:veyra:bot-metadata:1.0",
+  "title": "Veyra Bot Metadata Manifest",
+  "description": "JSON Schema for the veyra.json manifest required for submissions to the Veyra bot catalog. It implements version 1.0 of the Veyra Bot Metadata Specification.",
+  "$comment": "Duplicate variable names, SPDX License List membership, catalog license policy, and credential scanning are enforced by the Veyra submission system because JSON Schema cannot express those checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "name",
+    "description",
+    "category",
+    "version",
+    "license",
+    "repository",
+    "runtime",
+    "variables"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Version of the manifest format. For schema version 1.0 the only accepted value is the string \"1.0\".",
+      "examples": ["1.0"]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 60,
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9 ._-]{0,58}[A-Za-z0-9._-])$",
+      "description": "Public bot name shown in the catalog. Between 2 and 60 ASCII characters; the first character must be a letter or digit, the last character must be a letter, digit, dot, underscore, or hyphen, and internal spaces are allowed.",
+      "examples": ["Example Bot", "Moderator Pro"]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 280,
+      "pattern": "^\\S(?:[\\s\\S]*\\S)?$",
+      "description": "Short public description used on catalog cards and detail pages. Between 10 and 280 characters and must not start or end with whitespace.",
+      "examples": ["A small example bot used in the documentation."]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "moderation",
+        "utility",
+        "music",
+        "economy",
+        "fun",
+        "community",
+        "management",
+        "security",
+        "integration",
+        "other"
+      ],
+      "description": "Controlled catalog category. Arbitrary values are not accepted; see the category table in the specification.",
+      "examples": ["utility", "moderation"]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "description": "Bot release version in Semantic Versioning 2.0.0 format. Pre-release and build metadata are accepted.",
+      "examples": ["1.0.0", "2.1.0-beta.1", "1.4.2+build.17"]
+    },
+    "license": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9.+-]*(?:(?: (?:AND|OR) | WITH )[A-Za-z0-9][A-Za-z0-9.+-]*)*$",
+      "description": "SPDX license identifier or a simple SPDX expression using AND, OR, or WITH. Parentheses are not supported in schema version 1.0. Use LicenseRef-Proprietary for proprietary projects; such projects are not open source and are not eligible for the public catalog.",
+      "examples": [
+        "MIT",
+        "Apache-2.0",
+        "MIT OR Apache-2.0",
+        "GPL-3.0-only WITH Classpath-exception-2.0",
+        "LicenseRef-Proprietary"
+      ]
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s]+$",
+      "maxLength": 2048,
+      "description": "Public source code repository URL. Only HTTPS URLs are accepted.",
+      "examples": ["https://github.com/example-org/example-bot"]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "version"],
+      "description": "Runtime information used for catalog filters and compatibility checks.",
+      "properties": {
+        "language": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[a-z][a-z0-9+#.-]*$",
+          "description": "Primary implementation language in lowercase canonical form. Any language is allowed; VBS permits language-agnostic bots. Examples: typescript, javascript, python, java, csharp, go, rust, ruby, php.",
+          "examples": ["typescript", "python", "csharp"]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*)){0,2}$",
+          "description": "Minimum supported runtime version, expressed as one to three numeric components separated by dots (for example 24, 24.0, 24.0.0, or 3.12).",
+          "examples": ["24", "24.0.0", "3.12"]
+        },
+        "requirements": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "default": [],
+          "description": "Additional runtime requirements, such as external services, native packages, or Docker. Omit the property or use an empty array when there are none.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$",
+            "description": "A single runtime requirement. Must not start or end with whitespace."
+          },
+          "examples": [["Docker Engine 27 or newer", "PostgreSQL 16 or newer"]]
+        }
+      }
+    },
+    "variables": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "Environment variables the bot reads. The array may be empty. Variable names must be unique; JSON Schema cannot enforce uniqueness of a property across array items, so the Veyra submission system performs that semantic check.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "description", "required", "secret"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "description": "Environment variable name. Uppercase ASCII letters, digits, and underscores; it must start with a letter and be unique within the array.",
+            "examples": ["DISCORD_TOKEN", "LOG_LEVEL"]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$",
+            "description": "Purpose of the variable and the accepted values. Must not start or end with whitespace.",
+            "examples": ["Token used to authenticate the bot with Discord."]
+          },
+          "required": {
+            "type": "boolean",
+            "description": "When true, Veyra must collect a value before generating a distribution package. A required variable cannot define a default."
+          },
+          "secret": {
+            "type": "boolean",
+            "description": "When true, the value is sensitive: Veyra must mask it, never log or display it, and never store it in plaintext in the catalog. A secret variable cannot define a default."
+          },
+          "default": {
+            "type": "string",
+            "maxLength": 1024,
+            "pattern": "^[^\\r\\n]*$",
+            "description": "Optional default value applied when an optional, non-secret variable is left empty. The manifest is public, so defaults must never contain credentials. Forbidden when required or secret is true.",
+            "examples": ["info", "300"]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "required": {
+                  "const": true
+                }
+              },
+              "required": ["required"]
+            },
+            "then": {
+              "not": {
+                "required": ["default"]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "secret": {
+                  "const": true
+                }
+              },
+              "required": ["secret"]
+            },
+            "then": {
+              "not": {
+                "required": ["default"]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "examples": [
+    {
+      "schemaVersion": "1.0",
+      "name": "Example Bot",
+      "description": "A small example bot used in the documentation.",
+      "category": "utility",
+      "version": "1.0.0",
+      "license": "MIT",
+      "repository": "https://github.com/example-org/example-bot",
+      "runtime": {
+        "language": "typescript",
+        "version": "24.0.0"
+      },
+      "variables": []
+    }
+  ]
+}
