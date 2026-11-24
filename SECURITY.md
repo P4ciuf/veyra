@@ -7,9 +7,10 @@ Prisma data layer) exists today, and no version has been released yet.
 
 ## Supported Versions
 
-Veyra has not published any release yet (there are no git tags, and
-[CHANGELOG.md](./CHANGELOG.md) only contains an `[Unreleased]` section, which
-follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html)).
+Veyra has not published any release yet: there are no git tags, and
+[CHANGELOG.md](./CHANGELOG.md) records all work under `[Unreleased]` and
+`[0.1.0]`, explicitly noting that nothing has been tagged. The changelog follows
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 | Version                 | Security fixes     |
 | ----------------------- | ------------------ |

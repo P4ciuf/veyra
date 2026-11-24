@@ -37,7 +37,7 @@ plan is in [ROADMAP.md](../ROADMAP.md).
 | [Adding Your Bot to the Veyra Catalog](./ADDING_BOTS.md) | How to submit a bot to the Veyra catalog through the official website |
 | [Veyra Bot Standard (VBS)](./bot-standard/VBS-SPECIFICATION.md) | VBS v1.0.0: required root files, variables, Docker, attribution, and open-source licensing |
 | [Bot README template](./bot-standard/README.md) | README structure expected from catalog bots |
-| [Bot standard assets](./bot-standard/) | Template `.env.example`, `.dockerignore`, `Dockerfile`, `LICENSE`, `global_settings.json`, and an example bot archive |
+| [Bot standard assets](./bot-standard/) | Template `.env.example`, `.dockerignore`, `Dockerfile`, `LICENSE`, and `global_settings.json` |
 
 ## Design system
 
@@ -46,6 +46,10 @@ plan is in [ROADMAP.md](../ROADMAP.md).
 | [Brand identity and design system](./brand-identity/README.md) | Index for logo, colors, typography, tokens, components, layouts, and accessibility |
 
 ## Related root documents
+
+This directory is the canonical index for technical documentation. The files below
+stay at their conventional repository-root paths; they are linked here rather than
+duplicated in `docs/`.
 
 - [README.md](../README.md) — product overview, current implementation status, and development setup.
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — contribution workflow for the platform and rules for catalog submissions.

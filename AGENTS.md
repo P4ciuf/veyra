@@ -5,6 +5,7 @@ Veyra is an early-stage Discord-bot distribution platform. `README.md` and `ROAD
 ## Commands
 
 - Use Node.js 24 (CI, Dockerfiles, README) and pnpm 12.18.0 (pinned via `devEngines.onFail: download`); use pnpm, not npm/yarn, for repo commands.
+- `pnpm-workspace.yaml` pins `overrides` (`effect`, `minimatch`) for security advisories and `allowBuilds` for Prisma/esbuild; keep both when touching the lockfile or install config.
 - `pnpm install` runs workspace `prepare` scripts: it builds `shared/dist` and runs `prisma generate` + `tsc` for `database`. The bot resolves `shared` through gitignored `shared/dist`, so rebuild after deleting it.
 - Build all packages: `pnpm -r build` (topological). Run the bot: `pnpm --filter discord-bot dev` (watch) or `pnpm --filter discord-bot start` (= `node dist/main.js`, needs a build first). Package name is `discord-bot`; folder is `apps/discordBot`.
 - Quality gate, in this order: `pnpm run lint` → `pnpm run typecheck` → `pnpm run test`. CI (push to `main`, PRs) installs with `--frozen-lockfile`, then runs lint → typecheck → `pnpm -r build` → test; pre-push runs only typecheck + test, pre-commit runs `lint-staged`. Single test file: `pnpm exec vitest run <path>`. Also `pnpm run test:watch`, `pnpm run test:coverage`, `pnpm run format`.
@@ -33,3 +34,4 @@ Veyra is an early-stage Discord-bot distribution platform. `README.md` and `ROAD
 - `database`'s `build` script runs `tsc -p tsconfig.build.json` after clearing `dist`, so the emitted flat `dist/index.js` and `dist/index.d.ts` match `main`/`types`/`exports`. Like `shared`, the package has `files: ["dist"]` and a `prepack` build; `prisma generate` runs through the `prebuild` script.
 - `docker-compose.yaml` needs root `.env`; `apps/site/src/app/api/health/route.ts` is the site healthcheck target. The nginx `map` defining `$connection_upgrade` is active (the HTTPS block is still commented, so the `ssl/` files are not read yet); the bot has no healthcheck because it exposes no HTTP server. Port 443 is published but has no listener until HTTPS is enabled.
 - Catalog bots are never added via PR (submit through the website); open an issue before large core changes — see `CONTRIBUTING.md`.
+- Convention (`docs/development.md`): English comments/docs; JSDoc on every exported function, class, type, enum and reusable helper, `///` on Prisma models; inline comments only for non-obvious logic. `.sql` migrations are exempt.

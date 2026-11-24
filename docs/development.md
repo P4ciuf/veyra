@@ -155,6 +155,17 @@ an isolated image test, attach a placeholder with
 `docker run --rm -d --network veyra_veyra-net --network-alias site alpine:3 sleep 60`
 first.
 
+## Code documentation conventions
+
+Comments and documentation are written in English. Every exported function,
+class, interface, type and enum in the workspace and test sources has JSDoc that
+describes real behavior, side effects, edge cases and error conditions; reusable
+private helpers are documented the same way. Prisma models and enums use `///`
+documentation comments. Inline comments are reserved for non-obvious algorithms,
+workarounds, intentional oddities and architectural decisions — a comment that
+only restates the code is noise. `.sql` migrations are excluded from this
+convention. Keep comments and docs in sync with the code in the same change.
+
 ## Quality commands
 
 | Command | Description |
