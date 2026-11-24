@@ -62,6 +62,8 @@ A platform user, optionally linked to a Discord account.
 | `discordId` | `String?` | Unique; nullable until the Discord link exists |
 | `username` | `String` | Required |
 | `avatarHash` | `String?` | Optional |
+| `email` | `String?` | Optional; unique |
+| `password` | `String?` | Optional; no application code reads it yet |
 | `authorizedDeveloper` | `Boolean` | Defaults to `false` |
 | `role` | `UserRoles` | Defaults to `USER` |
 | `createdAt`, `updatedAt` | `DateTime` | Timestamps |
@@ -206,11 +208,16 @@ The two relations are named `warned_user` and `warned_by_user` to disambiguate t
 
 ## Migration
 
-The single committed migration is
-`20261120083712_create_initial_schema/migration.sql`. It creates the four enums,
-eleven tables, five unique indexes (`BotCategory.name`,
-`PrivateTestCategory.discordId`, `PrivateTestCategory.ownerDiscordId`,
-`Ticket.discordChannelId`, `User.discordId`), and the foreign keys described above.
+Two migrations are present in `database/prisma/migrations/`:
+
+- `20261120083712_create_initial_schema/migration.sql` creates the four enums,
+  eleven tables, five unique indexes (`BotCategory.name`,
+  `PrivateTestCategory.discordId`, `PrivateTestCategory.ownerDiscordId`,
+  `Ticket.discordChannelId`, `User.discordId`), and the foreign keys described
+  above.
+- `20261124103140_add_email_and_password_to_user/migration.sql` adds the nullable
+  `email` and `password` columns to `User` and a unique index on `User.email`.
+
 `migration_lock.toml` records `provider = "postgresql"`.
 
 ## Known gaps in the model
