@@ -27,6 +27,8 @@ const mocks = vi.hoisted(() => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
   /** `Loaders.LoadAll` of the class instantiated by the boot IIFE. */
   loadAll: vi.fn<() => Promise<void>>(),
+  /** REST command registration, called after loading and before login. */
+  registerCommands: vi.fn<() => Promise<boolean>>(),
   /** `dsClient.login`, called with the token from the (mocked) ENV. */
   login: vi.fn<(token: string) => Promise<void>>(),
   /** Graceful teardown, called by the exit path and the signal handlers. */
@@ -53,6 +55,10 @@ vi.mock("../../../apps/discordBot/src/core/client.js", () => ({
   dsClient: { login: mocks.login, user: { username: "veyra-test" } },
 }));
 
+vi.mock("../../../apps/discordBot/src/core/registerCommands.js", () => ({
+  registerCommands: mocks.registerCommands,
+}));
+
 vi.mock("../../../apps/discordBot/src/config/env.js", () => ({ ENV: mocks.env }));
 
 vi.mock("../../../apps/discordBot/src/core/shutdown.js", () => ({ shutdown: mocks.shutdown }));
@@ -76,6 +82,7 @@ describe("main entrypoint", () => {
     mocks.env.token = undefined;
     mocks.env.clientId = undefined;
     mocks.loadAll.mockResolvedValue(undefined);
+    mocks.registerCommands.mockResolvedValue(true);
     mocks.login.mockResolvedValue(undefined);
     mocks.shutdown.mockResolvedValue(undefined);
     // Defensive no-op: a stray real `process.exit` would terminate the worker.
@@ -102,6 +109,7 @@ describe("main entrypoint", () => {
     expect(mocks.logger.error).toHaveBeenCalledWith("Client ID or Token not found");
     expect(mocks.shutdown).toHaveBeenCalled();
     // The boot IIFE must never have started on the failure path.
+    expect(mocks.registerCommands).not.toHaveBeenCalled();
     expect(mocks.login).not.toHaveBeenCalled();
   });
 
@@ -115,8 +123,13 @@ describe("main entrypoint", () => {
       expect(mocks.login).toHaveBeenCalledWith("token-value");
     });
     expect(mocks.loadAll).toHaveBeenCalledTimes(1);
-    // The loader runs before the login: module auto-loading precedes Discord login.
+    expect(mocks.registerCommands).toHaveBeenCalledTimes(1);
+    // Commands can only be registered after loading, and must be published before
+    // the gateway login makes the bot visible to users.
     expect(mocks.loadAll.mock.invocationCallOrder[0]!).toBeLessThan(
+      mocks.registerCommands.mock.invocationCallOrder[0]!,
+    );
+    expect(mocks.registerCommands.mock.invocationCallOrder[0]!).toBeLessThan(
       mocks.login.mock.invocationCallOrder[0]!,
     );
     expect(mocks.logger.info).toHaveBeenCalledWith("Client logged in as: veyra-test");

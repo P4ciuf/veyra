@@ -81,6 +81,9 @@ describe("Loaders", () => {
   });
 
   afterEach(() => {
+    // The real `interactionCreate` event is loaded by the LoadAll test; remove
+    // its listener so no interaction dispatch leaks into unrelated tests.
+    dsClient.removeAllListeners("interactionCreate");
     vi.restoreAllMocks();
   });
 
@@ -379,16 +382,19 @@ describe("Loaders", () => {
   });
 
   describe("LoadAll", () => {
-    it("warns for every missing source directory and logs a zero summary", async () => {
+    it("warns for the four missing directories and loads the dispatcher event", async () => {
       await loader.LoadAll();
 
-      expect(vi.mocked(logger.warn)).toHaveBeenCalledTimes(5);
+      // `src/events` now exists (it holds the interactionCreate bridge), so only
+      // buttons, commands, menus and modals warn about a missing directory.
+      expect(vi.mocked(logger.warn)).toHaveBeenCalledTimes(4);
       expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
         expect.stringContaining("Path does not exist"),
       );
       expect(vi.mocked(logger.info)).toHaveBeenCalledWith(
-        "✓ Total loaded: 0 buttons, 0 commands, 0 events, 0 menus, 0 modals",
+        "✓ Total loaded: 0 buttons, 0 commands, 1 events, 0 menus, 0 modals",
       );
+      expect(dsClient.listenerCount("interactionCreate")).toBe(1);
     });
   });
 });

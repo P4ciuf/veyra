@@ -16,7 +16,7 @@ import {
 export interface Command {
   /** Slash command definition produced by a `SlashCommandBuilder` variant. */
   data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder;
-  /** Runs the command; awaited by the (future) interaction dispatcher. */
+  /** Runs the command; awaited by `dispatchInteraction`. */
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
 
@@ -27,11 +27,11 @@ export interface Command {
  */
 export interface Button {
   /**
-   * Registry key, or a predicate over the raw interaction id reserved for
-   * future dynamic matching; dynamic matching is not implemented yet.
+   * Registry key, or a predicate over the raw interaction id; the dispatcher
+   * evaluates predicates against the id received from Discord.
    */
   customId: string | ((id: string) => boolean);
-  /** Runs the button action; awaited by the (future) interaction dispatcher. */
+  /** Runs the button action; awaited by `dispatchInteraction`. */
   execute: (interaction: ButtonInteraction) => Promise<void>;
 }
 
@@ -57,7 +57,7 @@ export interface Event {
 export interface Menu {
   /** Registry key used to match the interaction's custom id. */
   customId: string;
-  /** Runs the menu action; awaited by the (future) interaction dispatcher. */
+  /** Runs the menu action; awaited by `dispatchInteraction`. */
   execute: (interaction: StringSelectMenuInteraction) => Promise<void>;
 }
 
@@ -68,10 +68,11 @@ export interface Menu {
  */
 export type Modal = {
   /**
-   * Registry key, or a predicate over the raw interaction id reserved for
-   * future dynamic matching; the loader keys a predicate by its source text.
+   * Registry key, or a predicate over the raw interaction id; the loader keys
+   * a predicate by its source text, while the dispatcher evaluates the original
+   * predicate stored on the handler.
    */
   customId: string | ((id: string) => boolean);
-  /** Runs the modal action; not awaited by the loader. */
+  /** Runs the modal action; the loader does not call it, the dispatcher awaits it. */
   execute: (interaction: ModalSubmitInteraction) => void;
 };

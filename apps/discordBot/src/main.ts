@@ -2,10 +2,13 @@
  * Bot entrypoint.
  *
  * Boot sequence: validate credentials from `ENV`, auto-load interaction modules
- * with {@link Loaders}, then log in to Discord. SIGINT/SIGTERM handlers intercept
- * the default termination and disconnect cleanly via {@link shutdown}.
+ * with {@link Loaders}, publish their slash commands through {@link registerCommands},
+ * then log in to Discord. The auto-loaded `interactionCreate` event routes incoming
+ * interactions to those handlers. SIGINT/SIGTERM handlers intercept the default
+ * termination and disconnect cleanly via {@link shutdown}.
  */
 import { Loaders } from "./core/loader";
+import { registerCommands } from "./core/registerCommands";
 import { dsClient } from "./core/client";
 import { ENV } from "./config/env";
 import { logger } from "shared";
@@ -20,10 +23,11 @@ if (!ENV.clientId || !ENV.token) {
   process.exit(1);
 }
 
-/** Boots the bot: module auto-loading, then Discord login. */
+/** Boots the bot: module loading, command registration, then Discord login. */
 (async () => {
   try {
     await new Loaders().LoadAll();
+    await registerCommands();
 
     await dsClient.login(ENV.token);
     logger.info("Client logged in as: " + dsClient.user?.username);
