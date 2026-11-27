@@ -3,24 +3,25 @@
 This document explains how to report security vulnerabilities in Veyra and what
 reporters can expect in return. Veyra is in early development: only the code in
 this repository (the Discord bot, the website with account registration and
-sign-in, shared packages, and the Prisma data layer) exists today, and no version
-has been released yet.
+sign-in, shared packages, and the Prisma data layer) exists today. The first
+release, [`v0.1.0`](https://github.com/P4ciuf/veyra/releases/tag/v0.1.0), was
+published on 2026-11-27 as a pre-release from commit `28fce8f`.
 
 ## Supported Versions
 
-Veyra has not published any release yet: there are no git tags, and
-[CHANGELOG.md](./CHANGELOG.md) records all work under `[Unreleased]` and
-`[0.1.0]`, explicitly noting that nothing has been tagged. The changelog follows
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Veyra follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) but is
+still in the `0.x` pre-release stage. The only published release is
+[`v0.1.0`](https://github.com/P4ciuf/veyra/releases/tag/v0.1.0); the work is
+recorded in [CHANGELOG.md](./CHANGELOG.md) under `[Unreleased]` and `[v0.1.0]`.
 
-| Version                 | Security fixes     |
-| ----------------------- | ------------------ |
-| `main` (default branch) | Yes                |
-| Released versions       | None published yet |
+| Version                 | Security fixes                 |
+| ----------------------- | ------------------------------ |
+| `main` (default branch) | Yes                            |
+| `v0.1.0` (pre-release)  | Yes, in the next `0.x` release |
 
 Security fixes are applied to the `main` branch and included in the next
-release. Once the first release is published, this table will list the versions
-that receive security fixes.
+release. Because `v0.1.0` is the only published version and the project is in
+early development, older released versions are not maintained separately.
 
 ## Reporting a Vulnerability
 

@@ -19,6 +19,7 @@
  * per test so a shared directory cannot cause cross-test false positives.
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockInstance } from "vitest";
@@ -107,7 +108,7 @@ const readFileSafe = (file: string): string =>
   fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
 
 beforeAll(() => {
-  tmpDir = fs.mkdtempSync("/tmp/opencode/veyra-logger-");
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "veyra-logger-"));
 });
 
 describe("logger", () => {
