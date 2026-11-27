@@ -7,10 +7,10 @@
  * two external modules are mocked: `@prisma/client` because the generated
  * client is an external boundary and the suite must not depend on
  * `prisma generate` having run, and `@prisma/adapter-pg` because it is a
- * database driver boundary. The barrel adds no logic of its own, so what must
- * be verified is that it forwards the mocked bindings by identity and does not
- * surface the `prisma` singleton from `src/setup.ts` (which would construct a
- * client and read configuration at import time).
+ * database driver boundary. `src/env.ts` is mocked with a placeholder
+ * connection string because the barrel also re-exports the `prisma` singleton
+ * from `src/setup.ts`; the singleton is lazy, so no client is constructed until
+ * one of its properties is read, but the collaborators still need stand-ins.
  */
 import { describe, expect, it, vi } from "vitest";
 
@@ -20,8 +20,10 @@ const mocks = vi.hoisted(() => ({
   prismaNamespace: { __prismaNamespace: true },
   /** Stand-in for `PrismaClient`, also re-exported by the barrel. */
   prismaClient: class PrismaClientStub {},
-  /** Stand-in for the `PrismaPg` driver adapter re-exported from `@prisma/adapter-pg`. */
-  prismaPg: { __prismaPg: true },
+  /** Constructor stand-in used when the lazy client is first accessed. */
+  prismaPg: class PrismaPgStub {},
+  /** Env snapshot available to `setup.ts` if a test accesses the client. */
+  env: { databaseUrl: "postgres://user:password@localhost:5432/veyra" },
 }));
 
 vi.mock("@prisma/client", () => ({
@@ -30,6 +32,8 @@ vi.mock("@prisma/client", () => ({
 }));
 
 vi.mock("@prisma/adapter-pg", () => ({ PrismaPg: mocks.prismaPg }));
+
+vi.mock("../../database/src/env.js", () => ({ ENV: mocks.env }));
 
 describe("database entry point", () => {
   it("re-exports the Prisma namespace from @prisma/client", async () => {
@@ -50,9 +54,12 @@ describe("database entry point", () => {
     expect(PrismaClient).toBe(mocks.prismaClient);
   });
 
-  it("does not export the prisma singleton from src/setup.ts", async () => {
-    const mod = await import("../../database/src/index.js");
+  it("re-exports the prisma singleton built by src/setup.ts", async () => {
+    const { prisma } = await import("../../database/src/index.js");
+    const { prisma: setupPrisma } = await import("../../database/src/setup.js");
 
-    expect("prisma" in mod).toBe(false);
+    // The barrel forwards the exact lazy singleton from setup.ts, not a new client.
+    expect(prisma).toBe(setupPrisma);
+    expect(prisma).toBeInstanceOf(mocks.prismaClient);
   });
 });
