@@ -17,8 +17,10 @@ The project-owned endpoints are:
 | `/api/auth/callback/{provider}` | GET, POST | Verifies state/PKCE, exchanges the code, resolves the user and creates the session |
 | `/api/auth/signin` | GET | Built-in provider selection page; the app's UI lives at `/signin` instead |
 | `/api/auth/session` | GET | Returns the current session derived from the JWT cookie |
-| `/api/auth/signout` | GET, POST | Clears the session cookie; the configured `/signout` target has no App Router page yet |
+| `/api/auth/signout` | GET, POST | Clears the session cookie; GET renders the configured `/signout` page, POST invalidates the session |
 | `/api/auth/register` | POST | Email/password registration; rejects malformed JSON and non-object bodies with 400 |
+| `/api/account/providers` | GET | Returns `{ "providers": [...] }` for the session user; 401 without a valid JWT |
+| `/api/account/providers` | DELETE | Unlinks the `provider` named in the JSON body; 400/401/404/409/500 as described below |
 | `/api/health` | GET | Dependency-free liveness probe returning `{ "ok": true }` for the compose healthcheck |
 
 `{provider}` is `github`, `google` or `discord`. The credentials login posts to
@@ -102,6 +104,33 @@ for all three providers. The decision, and why it satisfies the safety requireme
   from `Account.providerAccountId`. Users without any Discord identity are filled
   on their next Discord sign-in.
 
+## Linked-provider settings
+
+The UI at `/account` calls `/api/account/providers`. The route reads the user id
+from the NextAuth JWT with `getToken`, using `NEXTAUTH_SECRET` and the cookie
+prefix derived from `NEXTAUTH_URL`; it never trusts a user id supplied by the
+client. The service in `src/services/accountProviders.ts` filters provider ids
+against `OAUTH_PROVIDER_IDS`, so only the three configured OAuth identities can
+be listed or removed.
+
+`DELETE` removes all `Account` rows for that user and provider with a single
+`deleteMany`, but first checks the sign-in safety rule: a user with no
+`passwordHash` and only one linked account cannot unlink it (`409`), otherwise
+they would be locked out. Removing a provider does **not** clear `User.discordId`:
+tickets, warnings and bot requests reference that id, so it is kept as a stable
+identifier even after the OAuth identity is unlinked. Linking a new provider is
+still done by signing in with it from an existing session; there is no separate
+"add provider" form.
+
+| Status | Response | Condition |
+| --- | --- | --- |
+| `200` | `{ "providers": [...] }` | Successful GET, or successful DELETE with the remaining providers |
+| `400` | `{ "error": "Invalid request body" }` / `{ "error": "Unknown provider" }` | Malformed body, missing `provider`, or unregistered provider id |
+| `401` | `{ "error": "Not authenticated" }` | No valid JWT, or the user row no longer exists |
+| `404` | `{ "error": "Provider is not linked" }` | No `Account` row for that provider |
+| `409` | `{ "error": "Add another sign-in method before unlinking this one" }` | Last sign-in method of a passwordless user |
+| `500` | `{ "error": "Authentication is not configured" \| "Unable to ..." }` | Missing `NEXTAUTH_SECRET` or unexpected failure, logged through the shared logger |
+
 ## Error states
 
 | NextAuth code | UI behavior |
@@ -160,6 +189,19 @@ curl -i -X POST "http://localhost:3000/api/auth/register" \
   -d '{"username":"<USERNAME>","email":"<EMAIL>","password":"<PASSWORD>"}'
 ```
 
+Review and unlink providers from an authenticated browser session (replace the
+cookie placeholder with the real `next-auth.session-token` value; no token is
+stored in the repository):
+
+```bash
+curl -i "http://localhost:3000/api/account/providers" \
+  -H "Cookie: next-auth.session-token=<SESSION_TOKEN>"
+curl -i -X DELETE "http://localhost:3000/api/account/providers" \
+  -H "Cookie: next-auth.session-token=<SESSION_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"provider":"github"}'
+```
+
 ## Known limitations and open questions
 
 - A live Discord OAuth login still cannot be verified without real provider credentials
@@ -167,8 +209,10 @@ curl -i -X POST "http://localhost:3000/api/auth/register" \
   `tests/apps/site/discord-login-flow.test.ts`, which drives the real NextAuth
   callback handler with an in-memory adapter, and the backfill SQL is checked on a
   disposable database; neither replaces a real provider round trip.
-- There is no UI for reviewing or unlinking connected providers yet; linking requires
-  initiating provider sign-in from an existing session.
+- Linked providers can now be reviewed and removed at `/account`, but adding one
+  still requires signing in with it from an existing session; there is no dedicated
+  "add provider" form, and an OAuth round trip still cannot be verified end to end
+  without real provider credentials and registered callbacks.
 - `emailVerified` stays `null` for OAuth users, including Google users whose provider
   email is verified.
 - Open question: should verified-email linking be enabled later only for Google, and
@@ -192,3 +236,6 @@ curl -i -X POST "http://localhost:3000/api/auth/register" \
 - 2026-11-27 — Added the `Account`-based backfill migration for historical users,
   made conflict and write-failure logging explicit, and covered the real callback
   handler with an integration-style test.
+- 2026-11-27 — Documented the `/signout` page and the `/api/account/providers`
+  GET/DELETE endpoints: JWT-based user identification, provider allowlist, the
+  last-sign-in-method guard and the retained `discordId`.

@@ -21,4 +21,9 @@ describe("ROUTES", () => {
   it("sends both login methods to the same post-login destination", () => {
     expect(ROUTES.home).toBe("/");
   });
+
+  it("exposes the account settings page and its API route", () => {
+    expect(ROUTES.account).toBe("/account");
+    expect(ROUTES.accountProvidersApi).toBe("/api/account/providers");
+  });
 });

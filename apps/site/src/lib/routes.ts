@@ -2,9 +2,9 @@
  * Client-side navigation paths used by the site.
  *
  * `signIn` and `signOut` mirror the `pages` block configured for NextAuth in
- * `src/app/api/auth/[...nextauth]/route.ts`. That module is server-only and is
- * intentionally left untouched, so links target these constants instead of
- * repeating route strings across pages. `register` follows the same naming
+ * `src/lib/authConfig.ts`. The route handler is server-only and intentionally
+ * left untouched, so links target these constants instead of repeating route
+ * strings across pages. `register` follows the same naming
  * convention; registration itself is served by the existing API route, not by
  * NextAuth's `pages` configuration.
  */
@@ -19,6 +19,10 @@ export const ROUTES = {
   registerApi: "/api/auth/register",
   /** Destination after a successful credentials sign-in. */
   home: "/",
+  /** Account settings page with the linked-provider list. */
+  account: "/account",
+  /** API route used by account settings to read and unlink OAuth providers. */
+  accountProvidersApi: "/api/account/providers",
 } as const;
 
 /** Union of every path exposed by {@link ROUTES}. */
