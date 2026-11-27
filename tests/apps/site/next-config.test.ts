@@ -35,6 +35,7 @@ describe("next.config", () => {
     const cssRule = nextConfig.turbopack?.rules?.["*.css"];
 
     expect(cssRule).toEqual({
+      condition: { not: { path: "*.module.css" } },
       loaders: ["@tailwindcss/turbopack"],
       as: "*.css",
     });

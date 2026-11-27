@@ -2,12 +2,10 @@
  * Global styles for the site.
  * Tailwind CSS v4 is pulled in as a single stylesheet; the bundler wiring lives
  * in the Turbopack rule in `next.config.ts` (there is no PostCSS config).
- * `--background` is a leftover create-next-app scaffold variable: the placeholder
- * page styles itself with Tailwind utility classes, so nothing consumes it yet.
+ * The brand-identity token sheet is the single source of truth for the `--vy-*`
+ * semantic variables consumed by the auth components; importing it here keeps
+ * component styles free of hard-coded palette values. The placeholder page
+ * styles itself with Tailwind utility classes, so no local colors are defined here.
  */
 @import "tailwindcss";
-
-:root {
-  /* Unused today; kept from the scaffold until the real theme is designed. */
-  --background: #171717;
-}
+@import "../../../../docs/brand-identity/tokens/tokens.css";

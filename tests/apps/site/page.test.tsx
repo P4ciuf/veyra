@@ -1,16 +1,20 @@
 /**
  * Tests for `apps/site/src/app/page.tsx`.
  *
- * The page is a plain function component, so it is exercised the same way a
- * browser would see it: rendered into a jsdom document and queried through
- * accessible roles. The jsdom environment is requested per file (the pragma
- * below) so the rest of the suite keeps running in the cheaper node one.
- * Content and styling are still create-next-app placeholders; these tests
- * pin the current contract so a future implementation change is visible.
+ * The placeholder home page exposes a single "Sign In" button. It is a client
+ * component: `next/navigation`'s `useRouter` is mocked so the suite can verify
+ * that navigation happens only on click, never while rendering. The jsdom
+ * environment is requested per file (the pragma below) so the rest of the
+ * suite keeps running in the cheaper node one.
  */
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+
+const mocks = vi.hoisted(() => ({ push: vi.fn() }));
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: mocks.push }) }));
+
 import Home from "../../../apps/site/src/app/page.tsx";
 
 afterEach(() => {
@@ -18,20 +22,30 @@ afterEach(() => {
   // never registers; without an explicit cleanup, renders from one test leak
   // into the queries of the next one.
   cleanup();
+  mocks.push.mockClear();
 });
 
 describe("Home page", () => {
-  it("renders the placeholder landing heading", () => {
+  it("renders a single Sign In button and no headings", () => {
     render(<Home />);
 
-    // getByRole asserts accessibility semantics: the title must be reachable
-    // as the single top-level heading, not just present in the markup.
-    expect(screen.getByRole("heading", { level: 1, name: "Hello World" })).toBeTruthy();
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Sign In" })).toBeTruthy();
+    expect(screen.queryByRole("heading")).toBeNull();
   });
 
-  it("renders no other headings", () => {
+  it("does not navigate during render", () => {
     render(<Home />);
 
-    expect(screen.getAllByRole("heading")).toHaveLength(1);
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
+  it("navigates to /signin when the button is clicked", () => {
+    render(<Home />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(mocks.push).toHaveBeenCalledOnce();
+    expect(mocks.push).toHaveBeenCalledWith("/signin");
   });
 });

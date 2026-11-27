@@ -7,10 +7,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.3",
+    "argon2": "^0.45.2",
+    "database": "workspace:*",
+    "lucide-react": "^1.80.0",
     "next": "16.4.6",
+    "next-auth": "^4.24.15",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "database": "workspace:*"
+    "react-icons": "^5.7.0",
+    "shared": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",

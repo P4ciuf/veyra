@@ -1,0 +1,43 @@
+/// An external OAuth identity linked to a platform user.
+/// The composite key is the NextAuth convention: one row per provider plus
+/// provider account id, so the same person can link several providers.
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  /// Expiry as a Unix timestamp in seconds, as returned by the provider.
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+/// A database-backed session owned by the NextAuth Prisma adapter.
+/// The site currently uses JWT sessions (required by the Credentials provider),
+/// so these rows are not written by the running application.
+model Session {
+  /// Random token stored in the session cookie when database sessions are enabled.
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Single-use token for passwordless email sign-in, required by the adapter
+/// even though no email provider is registered today.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

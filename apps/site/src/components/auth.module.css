@@ -1,0 +1,477 @@
+/*
+ * Shared styles for the sign-in and registration screens.
+ * Every colour, radius, spacing, motion and size value comes from the Veyra
+ * token sheet imported by `app/globals.css`; state selectors follow the
+ * component specs in `docs/brand-identity/components/{buttons,inputs,feedback}.md`.
+ */
+
+.skipLink {
+  position: absolute;
+  top: var(--vy-space-2);
+  left: var(--vy-space-4);
+  z-index: var(--vy-z-toast);
+  transform: translateY(-200%);
+  padding: var(--vy-space-2) var(--vy-space-4);
+  border: 1px solid var(--vy-border-strong);
+  border-radius: var(--vy-radius-md);
+  background: var(--vy-bg-elevated);
+  color: var(--vy-text-primary);
+  font: 500 var(--vy-text-small-size) / var(--vy-text-small-line) var(--vy-font-sans);
+}
+
+.skipLink:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--vy-focus-ring);
+  outline-offset: var(--vy-focus-ring-offset);
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vy-space-10) var(--vy-space-4);
+  background: var(--vy-bg-app);
+  color: var(--vy-text-primary);
+  font-family: var(--vy-font-sans);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-6);
+  width: 100%;
+  max-width: 27rem;
+  padding: var(--vy-space-6);
+  border: 1px solid var(--vy-border-default);
+  border-radius: var(--vy-radius-lg);
+  background: var(--vy-bg-surface);
+  box-shadow: var(--vy-shadow-2);
+}
+
+.card a:focus-visible {
+  outline: 2px solid var(--vy-focus-ring);
+  outline-offset: var(--vy-focus-ring-offset);
+  border-radius: var(--vy-radius-sm);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-2);
+}
+
+.brand {
+  margin: 0;
+  color: var(--vy-text-secondary);
+  font: 600 var(--vy-text-caption-size) / var(--vy-text-caption-line) var(--vy-font-sans);
+  letter-spacing: var(--vy-text-caption-tracking);
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--vy-text-primary);
+  font: var(--vy-text-h1-weight) var(--vy-text-h1-size) / var(--vy-text-h1-line) var(--vy-font-sans);
+  letter-spacing: var(--vy-text-h1-tracking);
+}
+
+.description {
+  margin: 0;
+  color: var(--vy-text-secondary);
+  font: var(--vy-text-small-weight) var(--vy-text-small-size) / var(--vy-text-small-line)
+    var(--vy-font-sans);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-2);
+}
+
+.label {
+  color: var(--vy-text-primary);
+  font: 500 var(--vy-text-small-size) / var(--vy-text-small-line) var(--vy-font-sans);
+}
+
+.required {
+  color: var(--vy-danger-text);
+}
+
+.control {
+  position: relative;
+  display: flex;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--vy-control-md);
+  padding: 0 var(--vy-space-3);
+  border: 1px solid var(--vy-border-strong);
+  border-radius: var(--vy-radius-md);
+  background: var(--vy-bg-app);
+  color: var(--vy-text-primary);
+  font: var(--vy-text-body-weight) var(--vy-text-body-size) / var(--vy-text-body-line)
+    var(--vy-font-sans);
+  transition: border-color var(--vy-motion-fast) var(--vy-ease-standard);
+}
+
+.input::placeholder {
+  color: var(--vy-text-muted);
+}
+
+.inputWithAction {
+  padding-right: calc(var(--vy-space-3) + var(--vy-touch-target-min));
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--vy-text-muted);
+}
+
+.input:focus-visible {
+  border-color: var(--vy-focus-ring);
+  outline: 2px solid var(--vy-focus-ring);
+  outline-offset: var(--vy-focus-ring-offset);
+}
+
+.input[aria-invalid="true"] {
+  border: 2px solid var(--vy-danger);
+}
+
+.input:disabled {
+  border-color: var(--vy-border-default);
+  background: var(--vy-state-disabled-bg);
+  color: var(--vy-text-disabled);
+  cursor: not-allowed;
+}
+
+.reveal {
+  position: absolute;
+  top: 50%;
+  right: var(--vy-space-2);
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--vy-touch-target-min);
+  min-height: var(--vy-touch-target-min);
+  padding: 0;
+  border: none;
+  border-radius: var(--vy-radius-md);
+  background: transparent;
+  color: var(--vy-text-muted);
+  cursor: pointer;
+}
+
+.reveal:hover:not(:disabled) {
+  background: var(--vy-overlay-hover);
+  color: var(--vy-text-primary);
+}
+
+.reveal:focus-visible {
+  outline: 2px solid var(--vy-focus-ring);
+  outline-offset: var(--vy-focus-ring-offset);
+}
+
+.reveal:disabled {
+  color: var(--vy-text-disabled);
+  cursor: not-allowed;
+}
+
+.help,
+.error {
+  margin: 0;
+  font: var(--vy-text-small-weight) var(--vy-text-small-size) / var(--vy-text-small-line)
+    var(--vy-font-sans);
+}
+
+.help {
+  color: var(--vy-text-muted);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vy-space-2);
+  color: var(--vy-danger-text);
+}
+
+.icon {
+  flex: none;
+  width: var(--vy-icon-md);
+  height: var(--vy-icon-md);
+}
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--vy-text-muted);
+  font: var(--vy-text-small-weight) var(--vy-text-small-size) / var(--vy-text-small-line)
+    var(--vy-font-sans);
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: var(--vy-space-2);
+}
+
+.ruleIcon {
+  flex: none;
+  width: var(--vy-icon-sm);
+  height: var(--vy-icon-sm);
+}
+
+.ruleMet {
+  color: var(--vy-success);
+}
+
+.ruleUnmet {
+  color: var(--vy-text-muted);
+}
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vy-space-3);
+  padding: var(--vy-space-4);
+  border: 1px solid var(--vy-danger-border);
+  border-radius: var(--vy-radius-md);
+  background: var(--vy-danger-subtle);
+}
+
+.alertSuccess {
+  border-color: var(--vy-success-border);
+  background: var(--vy-success-subtle);
+}
+
+.alertIcon {
+  flex: none;
+  width: var(--vy-icon-md);
+  height: var(--vy-icon-md);
+  color: var(--vy-danger-text);
+}
+
+.alertSuccess .alertIcon {
+  color: var(--vy-success);
+}
+
+.alertBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-2);
+  min-width: 0;
+}
+
+.alertTitle {
+  margin: 0;
+  color: var(--vy-text-primary);
+  font: 500 var(--vy-text-small-size) / var(--vy-text-small-line) var(--vy-font-sans);
+}
+
+.alertText,
+.alertList {
+  margin: 0;
+  color: var(--vy-text-secondary);
+  font: var(--vy-text-small-weight) var(--vy-text-small-size) / var(--vy-text-small-line)
+    var(--vy-font-sans);
+}
+
+.alertList {
+  padding-left: var(--vy-space-5);
+}
+
+.alertLink,
+.footerLink {
+  color: var(--vy-accent);
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vy-space-2);
+  width: 100%;
+  min-height: var(--vy-control-md);
+  padding: 0 var(--vy-space-4);
+  border: none;
+  border-radius: var(--vy-radius-md);
+  background: var(--vy-action-primary);
+  color: var(--vy-action-primary-text);
+  font: 500 var(--vy-text-small-size) / var(--vy-text-small-line) var(--vy-font-sans);
+  cursor: pointer;
+  transition: background var(--vy-motion-fast) var(--vy-ease-standard);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--vy-action-primary-hover);
+}
+
+.submit:active:not(:disabled) {
+  background: var(--vy-action-primary-active);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--vy-focus-ring);
+  outline-offset: var(--vy-focus-ring-offset);
+}
+
+.submit:disabled {
+  background: var(--vy-state-disabled-bg);
+  color: var(--vy-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Loading keeps the Primary fill so the action stays identifiable while busy. */
+.submitLoading:disabled {
+  background: var(--vy-action-primary);
+  color: var(--vy-action-primary-text);
+  cursor: progress;
+}
+
+.spinner {
+  width: var(--vy-icon-md);
+  height: var(--vy-icon-md);
+  border: 2px solid var(--vy-overlay-active);
+  border-top-color: currentColor;
+  border-radius: var(--vy-radius-full);
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Secondary sign-in options: same tokens as the primary button, outlined to
+   keep the credentials action visually dominant. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--vy-space-3);
+  color: var(--vy-text-muted);
+  font: var(--vy-text-small-weight) var(--vy-text-small-size) / var(--vy-text-small-line)
+    var(--vy-font-sans);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--vy-border-default);
+}
+
+.providers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vy-space-2);
+}
+
+.providerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vy-space-2);
+  width: 100%;
+  min-height: var(--vy-control-md);
+  padding: 0 var(--vy-space-4);
+  border: 1px solid var(--vy-border-strong);
+  border-radius: var(--vy-radius-md);
+  background: var(--vy-bg-surface);
+  color: var(--vy-text-primary);
+  font: 500 var(--vy-text-small-size) / var(--vy-text-small-line) var(--vy-font-sans);
+  cursor: pointer;
+  transition: background var(--vy-motion-fast) var(--vy-ease-standard);
+}
+
+.providerButton:hover:not(:disabled) {
+  background: var(--vy-overlay-hover);
+}
+
+.providerButton:active:not(:disabled) {
+  background: var(--vy-overlay-active);
+}
+
+.providerButton:focus-visible {
+  outline: 2px solid var(--vy-focus-ring);
+  outline-offset: var(--vy-focus-ring-offset);
+}
+
+.providerButton:disabled {
+  border-color: var(--vy-border-default);
+  background: var(--vy-state-disabled-bg);
+  color: var(--vy-text-disabled);
+  cursor: not-allowed;
+}
+
+/* The active provider keeps its outline and label while the redirect is pending. */
+.providerLoading:disabled {
+  border-color: var(--vy-border-strong);
+  background: var(--vy-bg-surface);
+  color: var(--vy-text-primary);
+  cursor: progress;
+}
+
+.providerIcon {
+  flex: none;
+  width: var(--vy-icon-md);
+  height: var(--vy-icon-md);
+}
+
+.footer {
+  margin: 0;
+  color: var(--vy-text-secondary);
+  font: var(--vy-text-small-weight) var(--vy-text-small-size) / var(--vy-text-small-line)
+    var(--vy-font-sans);
+  text-align: center;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 639px) {
+  .page {
+    padding-block: var(--vy-space-6);
+  }
+
+  .card {
+    padding: var(--vy-space-4);
+  }
+
+  .input,
+  .submit,
+  .providerButton {
+    min-height: var(--vy-control-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-style: dotted;
+  }
+}

@@ -14,6 +14,9 @@
     // by `@vitejs/plugin-react` in `vitest.config.js`; this only affects types.
     "jsx": "react-jsx",
     "paths": {
+      // Site sources use @/* through their own tsconfig; mirror it here so
+      // component tests can typecheck imports from those modules.
+      "@/*": ["../apps/site/src/*"],
       "shared": ["../shared/src/index.ts"],
       "discord.js": ["../apps/discordBot/node_modules/discord.js/typings/index.d.mts"],
       // React lives in the `site` workspace package; map the types to its
@@ -21,7 +24,9 @@
       "react": ["../apps/site/node_modules/@types/react"],
       "react/jsx-runtime": ["../apps/site/node_modules/@types/react/jsx-runtime.d.ts"],
       "react-dom": ["../apps/site/node_modules/@types/react-dom"],
-      "react-dom/client": ["../apps/site/node_modules/@types/react-dom/client.d.ts"]
+      "react-dom/client": ["../apps/site/node_modules/@types/react-dom/client.d.ts"],
+      "next-auth": ["../apps/site/node_modules/next-auth"],
+      "next-auth/*": ["../apps/site/node_modules/next-auth/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

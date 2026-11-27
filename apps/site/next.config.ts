@@ -9,10 +9,13 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   // Tailwind CSS is wired as a Turbopack rule instead of a PostCSS plugin,
-  // which is the supported integration when Turbopack is enabled.
+  // which is the supported integration when Turbopack is enabled. The rule must
+  // skip CSS Modules: treating a `.module.css` file as plain CSS would drop
+  // Next's class-name mapping and leave `styles.*` undefined in components.
   turbopack: {
     rules: {
       "*.css": {
+        condition: { not: { path: "*.module.css" } },
         loaders: ["@tailwindcss/turbopack"],
         as: "*.css",
       },

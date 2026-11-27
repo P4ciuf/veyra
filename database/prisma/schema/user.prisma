@@ -1,15 +1,23 @@
 /// A platform user, optionally linked to a Discord account.
 /// `discordId` is nullable so a record can exist before the Discord link is
-/// established; relations that require a Discord id point at it.
+/// established; relations that require a Discord id point at it. `emailVerified`
+/// and `image` are owned by the NextAuth Prisma adapter: the adapter writes them
+/// when it creates a user from an OAuth profile, while the platform-specific
+/// `avatarUrl` mirrors `image` for the existing site conventions.
 model User {
   id        String  @id @default(cuid())
   discordId String? @unique
 
   username   String
   avatarHash String?
+  avatarUrl  String?
 
-  email    String? @unique
-  password String?
+  email         String?   @unique
+  /// Timestamp set by the email-provider flow; OAuth users keep it null.
+  emailVerified DateTime?
+  /// Avatar URL written by the NextAuth adapter from the provider profile.
+  image         String?
+  passwordHash  String?
 
   authorizedDeveloper Boolean   @default(false)
   role                UserRoles @default(USER)
@@ -21,6 +29,10 @@ model User {
   AuthorizationRequests AuthorizationRequest[]
   warns                 Warn[]                 @relation("warned_user")
   addWarns              Warn[]                 @relation("warned_by_user")
+  /// OAuth identities linked to this user (one row per provider account id).
+  accounts              Account[]
+  /// Database sessions; unused while the site runs JWT sessions, kept for adapter parity.
+  sessions              Session[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
