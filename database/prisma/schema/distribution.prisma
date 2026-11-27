@@ -1,0 +1,39 @@
+/// A generated package delivered to one user from one specific bot version.
+/// Only non-secret customization metadata is stored here: the environment
+/// values supplied by the user are written to the generated `.env` and are
+/// deliberately never persisted. The signed download URL is derived on demand
+/// from `packagePath` instead of being stored as a long-lived credential.
+model Distribution {
+  id String @id @default(cuid())
+
+  botId     String
+  versionId String
+  userId    String
+
+  /// Name chosen by the user and mirrored into `global_settings.json`.
+  displayName String?
+  /// Description chosen by the user and mirrored into `global_settings.json`.
+  description String?
+  /// Location of the generated archive in the package storage backend.
+  packagePath String
+  /// Expiry of the signed link, 72 hours after the package was generated.
+  expiresAt   DateTime
+
+  /// The catalog bot this package was generated from. Deleting the bot removes its package history.
+  bot     Bot        @relation(fields: [botId], references: [id], onDelete: Cascade)
+  /// The immutable release used for this package; restricting deletion preserves history.
+  version BotVersion @relation(fields: [versionId], references: [id], onDelete: Restrict)
+  /// Owning site user; `User.id` is used instead of `discordId` so email/password users are supported.
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Supports the per-user distribution history view.
+  @@index([userId, createdAt])
+  /// Supports cleanup of packages whose signed link has expired.
+  @@index([expiresAt])
+  /// Supports listing the packages generated from a bot or one of its versions.
+  @@index([botId])
+  @@index([versionId])
+}

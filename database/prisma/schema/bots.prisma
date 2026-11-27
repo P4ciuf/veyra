@@ -11,8 +11,10 @@ model BotCategory {
   updatedAt DateTime @updatedAt
 }
 
-/// A published bot entry in the catalog. `filePath` points at the stored
-/// distribution artifact; `version` is the currently published version.
+/// A published bot entry in the catalog. `filePath` points at the artifact of
+/// the currently published version; `version` is a denormalized mirror of
+/// `BotVersion.version` kept for existing consumers. Independent versions are
+/// stored in `BotVersion`, so older releases remain addressable and immutable.
 model Bot {
   id String @id @default(cuid())
 
@@ -22,10 +24,38 @@ model Bot {
 
   filePath String
 
-  category BotCategory @relation(fields: [categoryName], references: [name])
+  category      BotCategory    @relation(fields: [categoryName], references: [name])
+  /// Every published release, including the ones superseded by a newer version.
+  versions      BotVersion[]
+  /// Packages generated for users from any version of this bot.
+  distributions Distribution[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// An immutable, independently addressable release of a catalog bot.
+/// `version` is unique per bot, so a repository can publish several releases
+/// without overwriting the metadata or artifact of an older one.
+model BotVersion {
+  id String @id @default(cuid())
+
+  botId     String
+  /// Semver string as declared in the bot's `veyra.json`; unique per bot.
+  version   String
+  /// Path of the stored source artifact for this exact release.
+  filePath  String
+  /// Human-readable release notes; optional because the manifest does not require them.
+  changelog String?
+
+  bot           Bot            @relation(fields: [botId], references: [id], onDelete: Cascade)
+  /// Distributions created from this release. Restricting deletion keeps history consistent.
+  distributions Distribution[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([botId, version])
 }
 
 /// A user's request to add a bot to the catalog.

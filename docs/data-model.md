@@ -2,7 +2,7 @@
 
 This document describes the Prisma schema, the generated client, and how the data
 layer is intended to be used. The schema is split across
-`database/prisma/schema/*.prisma` files and applied through four SQL migrations in
+`database/prisma/schema/*.prisma` files and applied through six SQL migrations in
 `database/prisma/migrations/`.
 
 **Current status:** the site reads and writes `User` rows through
@@ -48,6 +48,10 @@ erDiagram
     User ||--o{ Account : "provider + providerAccountId"
     User ||--o{ Session : "sessionToken"
     BotCategory ||--o{ Bot : "categoryName"
+    Bot ||--o{ BotVersion : "botId"
+    Bot ||--o{ Distribution : "botId"
+    BotVersion ||--o{ Distribution : "versionId"
+    User ||--o{ Distribution : "userId"
     PrivateTestCategory ||--o{ PrivateTestChannel : "discordId"
 ```
 
@@ -55,7 +59,8 @@ Most primary keys are `String` values generated with `cuid()`. `Warn.id` is the 
 `Int` key and uses `autoincrement()`. The platform models (`User`, `BotCategory`,
 `Bot`, `botAddRequest`, `AuthorizationRequest`, `PrivateTestCategory`,
 `PrivateTestChannel`, `Reviews`, `Ticket`, `TicketMessage` and `Warn`) carry
-`createdAt` (`@default(now())`) and `updatedAt` (`@updatedAt`) fields. The three
+`createdAt` (`@default(now())`) and `updatedAt` (`@updatedAt`) fields, as do the
+new `BotVersion` and `Distribution` models. The three
 NextAuth adapter models (`Account`, `Session`, `VerificationToken`) do not declare
 timestamps.
 
@@ -140,13 +145,57 @@ A published catalog entry.
 | `id` | `String` | Primary key, `cuid()` |
 | `name` | `String` | Required |
 | `categoryName` | `String` | Foreign key to `BotCategory.name` |
-| `version` | `String` | Currently published version |
-| `filePath` | `String` | Path to the stored distribution artifact |
+| `version` | `String` | Denormalized mirror of the current `BotVersion.version` |
+| `filePath` | `String` | Path to the artifact of the currently published version |
 | `createdAt`, `updatedAt` | `DateTime` | Timestamps |
 
 The relation to `BotCategory` uses `ON DELETE RESTRICT ON UPDATE CASCADE` in the
-migration. The schema models a single version string per bot; it does not yet model
-the independent version history described in the product plan.
+migration. `version` is retained for existing readers of the catalog; publishing a
+new release creates a `BotVersion` row and refreshes these two mirror fields.
+
+### `BotVersion`
+
+An immutable, independently addressable release of a catalog bot. This replaces
+the single-version model with a history: a new release is a new row, so an older
+version keeps its own metadata and artifact.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String` | Primary key, `cuid()` |
+| `botId` | `String` | Foreign key to `Bot.id`, `ON DELETE CASCADE` |
+| `version` | `String` | Semver release identifier; unique together with `botId` |
+| `filePath` | `String` | Stored artifact of this exact release |
+| `changelog` | `String?` | Optional release notes |
+| `createdAt`, `updatedAt` | `DateTime` | Timestamps |
+
+The `@@unique([botId, version])` constraint prevents publishing the same version
+twice for one bot. Distributions reference a `BotVersion` with `ON DELETE RESTRICT`,
+so a release that was handed to users cannot be removed silently.
+
+### `Distribution`
+
+A generated package delivered to one user from one specific bot version. This is
+the storage half of the planned distribution flow; no application code writes these
+rows yet.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String` | Primary key, `cuid()` |
+| `botId` | `String` | Foreign key to `Bot.id`, `ON DELETE CASCADE` |
+| `versionId` | `String` | Foreign key to `BotVersion.id`, `ON DELETE RESTRICT` |
+| `userId` | `String` | Foreign key to `User.id`, `ON DELETE CASCADE` |
+| `displayName` | `String?` | Non-secret name mirrored into `global_settings.json` |
+| `description` | `String?` | Non-secret description mirrored into `global_settings.json` |
+| `packagePath` | `String` | Location of the generated archive |
+| `expiresAt` | `DateTime` | Expiry of the signed link (72 hours after generation) |
+| `createdAt`, `updatedAt` | `DateTime` | Timestamps |
+
+`userId` references `User.id`, not `discordId`: email/password users have no Discord
+id but still need a distribution history. Environment values supplied by the user
+are written only into the generated `.env` and are never stored here; the signed
+download URL is derived on demand from `packagePath` and checked against
+`expiresAt`, so no long-lived credential is kept. Indexes on `(userId, createdAt)`
+and `expiresAt` support the history view and cleanup of expired packages.
 
 ### `botAddRequest`
 
@@ -254,7 +303,7 @@ The two relations are named `warned_user` and `warned_by_user` to disambiguate t
 
 ## Migration
 
-Five migrations are present in `database/prisma/migrations/`:
+Six migrations are present in `database/prisma/migrations/`:
 
 - `20261120083712_create_initial_schema/migration.sql` creates the four enums,
   eleven tables, five unique indexes (`BotCategory.name`,
@@ -277,16 +326,21 @@ Five migrations are present in `database/prisma/migrations/`:
   their next Discord sign-in. When several Discord accounts are linked, the
   smallest id is chosen; ids already owned by another row are left untouched so
   the unique index and its foreign keys stay valid. The statement is idempotent
-  and can be re-run safely.
+   and can be re-run safely.
+- `20261127130000_add_distributions_and_bot_versions/migration.sql` creates
+   `BotVersion` and `Distribution` with their indexes and foreign keys. It is
+   purely additive: no existing table or column is changed, so current catalog
+   rows remain valid and `Bot.version` keeps its meaning until a publication flow
+   starts maintaining the version history.
 
 `migration_lock.toml` records `provider = "postgresql"`.
 
 ## Known gaps in the model
 
-- No model represents distributions, download links, their expiration, or generated
-  packages, although these are central to the planned product.
+- No application code writes `BotVersion` or `Distribution` rows yet: the release
+  publication flow and the distribution service are still to be implemented, and
+  `Bot.version`/`Bot.filePath` are not yet kept in sync automatically.
 - `Reviews` has no bot relation and `TicketMessage` has no ticket relation.
-- `Bot` stores one `version` string rather than independent versions.
 - The lowercase `botAddRequest` and plural `Reviews` identifiers are historical and
   are kept to avoid rename-only migrations.
 - OAuth users keep `emailVerified` null; verified-email account linking is not
