@@ -17,7 +17,7 @@ Related: [README](README.md) · [Brand guidelines](brand/brand-guidelines.md#44-
 - All focusable elements show a focus indicator on `:focus-visible`: `outline: 2px solid var(--vy-focus-ring); outline-offset: 2px`.
 - Focus ring color is Accent `#A78BFA` (dark: 6.83:1 on Background, 6.12:1 on Surface, 5.40:1 on Elevated) and `#5B3FE0` (light). The ring must always be ≥ 3:1 against adjacent colors.
 - Never `outline: none` without an equivalent replacement. Use `:focus-visible` (not `:focus`) so mouse clicks do not show rings, keyboard use always does.
-- Where a parent clips overflow, use an inset ring (negative `outline-offset`) or the `focus-ring` box-shadow token.
+- Where a parent clips overflow, use an inset ring (negative `outline-offset`). `tokens/shadows.json` defines a `focus-ring` box-shadow value for this case, but `tokens/tokens.css` currently emits only the `--vy-focus-ring` color, not a shadow custom property.
 
 ## 3. Contrast
 
@@ -58,7 +58,7 @@ Prefer native HTML elements; add ARIA only when native semantics are insufficien
 
 ## 6. Reduced motion
 
-- Honor `@media (prefers-reduced-motion: reduce)`: transitions and animations resolve to 0 (see `tokens/motion.json` and the bottom of `tokens/tokens.css`).
+- Honor `@media (prefers-reduced-motion: reduce)`: in `tokens/tokens.css` the `--vy-motion-*` variables become `0ms`, while the blanket rule sets `animation-duration` and `transition-duration` to `0.01ms !important` (see `tokens/motion.json` and the bottom of `tokens/tokens.css`).
 - Replace spinner rotation with an opacity pulse or static text, disable skeleton shimmer, remove scale/translate on dialogs, toasts and drawers.
 - Nothing flashes more than three times per second. No autoplaying motion longer than 5 seconds without a pause control.
 

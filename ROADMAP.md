@@ -23,16 +23,35 @@ Development plan for Veyra, organized in incremental phases. Each phase delivers
 
 ---
 
+## Current status
+
+### Completed
+
+- **Foundations (Phase 0):** stack decisions, pnpm monorepo and conventions, CI (lint, typecheck, build, test), Apache-2.0 license, community policies, VBS and the `veyra.json` JSON Schema, brand identity and roles (`package.json`, `.github/workflows/ci.yml`, `schemas/bot-metadata.schema.json`, `docs/bot-standard/`).
+- **Accounts (Phase 1):** registration (`POST /api/auth/register`, `/register`) and sign-in (`/signin`) with email/password plus GitHub, Google and Discord OAuth, JWT sessions and logout, Argon2id hashing (`apps/site/src/app/api/auth/`, `apps/site/src/lib/authConfig.ts`, `apps/site/src/services/hash.ts`).
+- **Data layer:** Prisma 7 package with PostgreSQL adapter, lazy `prisma` barrel and four migrations, including the NextAuth adapter models (`database/prisma/`, `database/src/`).
+- **Quality and deployment:** 32 root-level Vitest files covering bot, site, database, shared and schema; multi-stage Docker images and the Compose/nginx stack (`tests/`, `apps/*/Dockerfile`, `docker-compose.yaml`).
+- **Documentation:** `docs/` guides and `docs/api_documentation.md` as the canonical internal API reference; no Swagger/OpenAPI spec exists in the repository.
+
+### In Progress
+
+- **Data model (Phase 0):** user, auth and OAuth adapter tables are in place; distributions, bot versions and independent version history are still to design (`docs/data-model.md`).
+- **Official Discord bot (Phase 3):** skeleton with env validation, interaction loader and login works, but the interaction directories are absent and there is no `interactionCreate` dispatcher or REST command registration, so loaded handlers never reach Discord (`apps/discordBot/src/`, `docs/architecture.md`).
+- **Account flows (Phase 1):** `/signout` is configured as NextAuth's sign-out page but has no App Router file; there is no UI to review or unlink providers, and end-to-end OAuth cannot be verified without real provider credentials (`apps/site/src/lib/routes.ts`, `docs/api_documentation.md`).
+- **Working tree:** the auth feature, migrations, documentation and test updates exist in uncommitted changes on `main`; CI still pins pnpm 12.18.0 while `devEngines` and both Dockerfiles use 12.23.0 (`.github/workflows/ci.yml`, `package.json`).
+
+---
+
 ## Phase 0 · Foundations
 
 **Goal:** define the technical and product foundations before writing application code.
 
-- [~] Choose the stack (frontend, bot, and database decided; backend, package storage, and hosting remain TBD)
+- [x] Choose the stack (frontend, bot, and database decided; backend, package storage, and hosting remain TBD)
 - [x] Create repository, monorepo structure and code conventions
 - [x] Set up CI (lint, typecheck, test, build)
 - [x] Define the project license
 - [x] Write `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`
-- [~] Design the data model: users, bots (single version field), categories, reviews, tickets, warnings, bot-add and authorization requests; distributions and independent version history still to design
+- [~] Design the data model: users (with auth/OAuth adapter tables), bots (single version field), categories, reviews, tickets, warnings, bot-add and authorization requests; four migrations are present, while distributions and independent version history still to design
 - [x] Define the **Veyra bot standard**: `veyra.json`, `global_settings.json`, `.env.example`, README, license
 - [x] Define the catalog metadata format ([Veyra Bot Metadata Specification](./docs/specifications/bot-metadata.md), [JSON Schema](./schemas/bot-metadata.schema.json))
 - [x] Create brand identity and design system (logo, colors, components)
@@ -49,13 +68,15 @@ Development plan for Veyra, organized in incremental phases. Each phase delivers
 
 ### Authentication
 
-- [ ] Registration
-- [ ] Login with secure sessions
-- [ ] Logout and session management
+- [x] Registration
+- [x] Login with secure sessions
+- [x] Logout and session management (JWT lifecycle via NextAuth; the configured `/signout` page has no App Router file yet)
 - [ ] Password recovery
 - [ ] Rate limiting on login and registration
-- [ ] Secure password hashing
-- [ ] (Optional) Discord login and Discord account linking
+- [x] Secure password hashing
+- [x] (Optional) Discord login and Discord account linking
+- [x] GitHub and Google OAuth sign-in alongside Discord (`apps/site/src/lib/authConfig.ts`)
+- [x] Registration API and `/register` page with client-side validation (`apps/site/src/app/api/auth/register/route.ts`)
 
 ### User dashboard (basic)
 
@@ -118,7 +139,7 @@ Development plan for Veyra, organized in incremental phases. Each phase delivers
 
 **Goal:** replicate distribution on Discord, with an experience consistent with the website.
 
-- [ ] Set up and deploy the official bot
+- [~] Set up and deploy the official bot: env validation, interaction loader and login exist in `apps/discordBot`, but there is no `interactionCreate` dispatcher or REST command registration, so loaded handlers never reach Discord
 - [ ] **Main Panel** with interactive menu
 - [ ] Category selection
 - [ ] Version selection

@@ -8,7 +8,7 @@ focuses on commands that exist in the repository today. For the full workflow, s
 ## Prerequisites
 
 - Node.js 24 or newer (CI and both Dockerfiles use Node 24).
-- pnpm 12.18.0, pinned in the root `package.json` `devEngines` field. Use pnpm only.
+- pnpm 12.23.0, pinned in the root `package.json` `devEngines` field. Use pnpm only.
 - Git, needed by Husky to install the repository hooks.
 - A Discord application with a bot token for running the official bot. The
   privileged `MessageContent` and `GuildMembers` intents must be enabled in the
@@ -75,9 +75,11 @@ interaction modules found under `src/commands`, `src/events`, and
 directories do not exist in a fresh clone, so a warning for each missing path is
 expected; see [Modules and API reference](./modules.md).
 
-The website serves a placeholder "Hello World" page at `/` and a JSON health
-response at `/api/health`. The catalog and distribution features described in the
-root README are not implemented yet.
+The website serves a placeholder landing page at `/` with a Sign In button, a JSON
+health response at `/api/health`, and account screens at `/register` and `/signin`
+backed by `/api/auth/register` and the NextAuth catch-all route. OAuth providers
+need the credentials listed in [Configuration](./configuration.md); the catalog and
+distribution features described in the root README are not implemented yet.
 
 ## Check the installation
 

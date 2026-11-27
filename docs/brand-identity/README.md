@@ -15,6 +15,8 @@ Veyra is a free and open-source platform for discovering, distributing, configur
 
 This is the **single source of truth** for how Veyra looks and behaves: the website, dashboard, documentation and community platforms. It gives designers and frontend developers a shared set of tokens, component specifications and layout rules so every Veyra surface feels like one coherent, serious software product.
 
+These are target-state specifications, not a description of shipped screens. The implemented site currently consumes these tokens in the authentication screens (`apps/site/src/components/auth.module.css`); the dashboard, catalog and navigation surfaces described here are still to be built. The site loads Geist and Geist Mono through `next/font/google` in `apps/site/src/app/layout.tsx`, but has not mapped them to Tailwind's `font-sans` / `font-mono` utilities; `tokens.css` is imported from `apps/site/src/app/globals.css` rather than linked from HTML.
+
 ## 3. Brand identity and visual principles
 
 Veyra should feel **modern, professional, minimalist, reliable, developer-focused, technologically advanced and accessible**. It avoids gaming aesthetics, decorative clutter and gradient overuse.
@@ -132,7 +134,7 @@ Files in [`tokens/`](tokens/) are the machine-readable source of truth:
 | [`radius.json`](tokens/radius.json) | Border radius scale and nesting rule |
 | [`shadows.json`](tokens/shadows.json) | Elevation (dark/light), border widths, focus ring |
 | [`motion.json`](tokens/motion.json) | Durations, easing, reduced-motion rules |
-| [`tokens.css`](tokens/tokens.css) | CSS custom properties (`--vy-*`) for the palette, type scale, spacing, sizing, radius, shadows, motion and z-layers; named layout/breakpoint and font-weight tokens are not emitted, but two hard-coded media queries override type sizes. No generator script is committed |
+| [`tokens.css`](tokens/tokens.css) | CSS custom properties (`--vy-*`) for the palette, type scale, spacing, sizing, radius, shadows, motion and z-layers; named layout/breakpoint, font-weight, border-width and focus-shadow tokens are not emitted, and two hard-coded `max-width` media queries override type sizes and line heights. No generator script is committed |
 
 Quick start:
 

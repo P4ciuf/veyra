@@ -218,13 +218,14 @@ Do not use `console` in application code; use this facade.
 ```ts
 export * from "@prisma/client";
 export { PrismaPg } from "@prisma/adapter-pg";
+export { prisma } from "./setup";
 ```
 
 The barrel re-exports the full generated client surface, including `PrismaClient`,
-the `Prisma` namespace, and generated enums. It does **not** export the `prisma`
-singleton, and importing the barrel does not read environment variables or construct
-a client. A generated Prisma client must exist (`pnpm --filter database generate`)
-before this module can be imported.
+the `Prisma` namespace, and generated enums, plus the lazily initialized `prisma`
+singleton. Importing it does not read environment variables or construct a client:
+the singleton resolves those on first use. A generated Prisma client must exist
+(`pnpm --filter database generate`) before this module can be imported.
 
 ### `src/env.ts` — `ENV`
 
@@ -242,12 +243,15 @@ Prisma CLI loads `database/.env` (see [Configuration](./configuration.md#databas
 export const prisma: PrismaClient;
 ```
 
-Constructed at import time from a `PrismaPg` adapter using `ENV.databaseUrl`. Throws
-`DATABASE_URL not found in environment variables` when the value is missing or empty;
-the message keeps a historical name even though the variable actually read is
-`DATABASE_CONNECTION_STRING`. The package `exports` map exposes only the root entry,
-so this singleton is not reachable through a `database/src/setup` subpath; no
-application imports it today.
+A proxy around a Prisma client that is constructed on first property access from a
+`PrismaPg` adapter and the live `DATABASE_CONNECTION_STRING` (falling back to
+`ENV.databaseUrl`). It throws `DATABASE_URL not found in environment variables`
+when the value is missing or empty, but only on first use, so importing the barrel
+is side-effect free. The message keeps a historical name even though the variable
+actually read is `DATABASE_CONNECTION_STRING`. The package `exports` map exposes
+only the root entry, so this singleton is reachable through the barrel, not a
+`database/src/setup` subpath; the site auth and registration code imports it from
+the barrel.
 
 ### `prisma.config.ts`
 
@@ -277,8 +281,119 @@ font variables.
 export default function Home();
 ```
 
-Renders the placeholder landing page at `/`. Its only content is an `<h1>` reading
-`Hello World`; the catalog described in the root README is not implemented.
+Client component rendering the placeholder landing page at `/`. It shows one
+`Sign In` button that calls `useRouter().push(ROUTES.signIn)` on click; `redirect`
+is not used because it would run during render. The catalog described in the root
+README is not implemented.
+
+### `src/app/signin/page.tsx` and `src/app/register/page.tsx`
+
+```tsx
+export const metadata: Metadata;
+export default function SignInPage();
+export default function RegisterPage();
+```
+
+Server components that own browser metadata and mount the corresponding client
+form. `/signin` matches the `pages.signIn` (and `pages.error`) value in the NextAuth
+handler; `/register` follows the same convention because NextAuth has no
+registration page setting. The sign-in page wraps the form in `<Suspense>` because
+the client form reads `?error=` with `useSearchParams`; neither page implements
+authentication itself. The sign-in form calls `signIn` from `next-auth/react` for
+both credentials and OAuth, and the registration form posts to `/api/auth/register`.
+
+### `src/components/authShell.tsx`, `formField.tsx`, `signInForm.tsx`, `registerForm.tsx`
+
+`AuthShell` supplies the skip link, `<main>` landmark, single `<h1>` and footer
+cross-link. `FormField` renders a labelled input with password reveal, help/error
+text and the required ARIA wiring. The two form components hold client-side state,
+validate on blur/submit and expose loading, error and success states. `signInForm.tsx`
+also renders one labelled button per entry in `OAUTH_PROVIDER_OPTIONS`, with inline
+brand SVG icons, a spinner and a disabled state shared with the credentials form.
+`auth.module.css` is imported into `globals.css` together with
+`docs/brand-identity/tokens/tokens.css` and uses `--vy-*` tokens for colors,
+spacing, typography, radius, motion and elevation; a few literal values remain for
+border widths and font weights.
+
+### `src/lib/oauth.ts`, `authError.ts`, `authUser.ts`
+
+`OAUTH_PROVIDER_IDS`, `OAuthProviderId` and `OAUTH_PROVIDER_OPTIONS` are the single
+source of truth for the three provider buttons; `isOAuthProviderId` is a type guard.
+`readAuthErrorMessage` maps a NextAuth `?error=` code to a generic, non-leaking
+message and `PROVIDER_FAILURE_MESSAGE` covers a rejected client-side redirect.
+`completePlatformUser` derives the required `username` (email local part, or the
+existing `user-<hex>` fallback) and mirrors the provider `image` into `avatarUrl`.
+
+### `src/lib/authConfig.ts`, `src/services/authAdapter.ts`
+
+```ts
+export interface AuthEnvironment { /* OAuth client ids/secrets, NEXTAUTH_* */ }
+export type DiscordIdPersister = (userId: string, discordId: string) => Promise<boolean>;
+export function buildAuthOptions(
+  env: AuthEnvironment,
+  adapter: Adapter,
+  persistDiscordId: DiscordIdPersister,
+): NextAuthOptions;
+export function createAuthAdapter(base: Adapter): Adapter;
+```
+
+`buildAuthOptions` registers GitHub, Google, Discord and Credentials, sets JWT
+sessions, maps `/signin` to `signIn`, `signOut` and `error`, and derives `Secure`
+cookies from `NEXTAUTH_URL`. It leaves `allowDangerousEmailAccountLinking`
+disabled, so no account is taken over from an unverified email match. Its Discord
+provider maps the profile id into `discordId`, and its `signIn` event passes that
+id to `persistDiscordId` after every Discord sign-in (new, returning or explicitly
+linked). The event logs a failed write through the shared logger instead of
+throwing, so a valid OAuth login is not turned into an error redirect.
+`createAuthAdapter` wraps only `createUser`, adding the platform columns and
+forwarding `discordId` before delegating to the Prisma adapter.
+
+### `src/services/auth.ts` and `src/services/hash.ts`
+
+```ts
+async function getUser(options: Prisma.UserWhereInput): Promise<User | null>;
+async function createUser(inputData: {
+  email: string;
+  password: string;
+  username?: string;
+  avatarUrl?: string;
+}): Promise<User>;
+async function setUserDiscordId(userId: string, discordId: string): Promise<boolean>;
+export { getUser, createUser, setUserDiscordId };
+
+export async function createHash(password: string): Promise<string>;
+export async function verifyHash(password: string, hashedPassword: string): Promise<boolean>;
+```
+
+`getUser` forwards a Prisma filter to `prisma.user.findFirst`. `createUser` hashes
+the plaintext password with Argon2id and passes only `email`, `username` (a
+`user-<hex>` fallback when omitted), `avatarUrl` (when supplied) and `passwordHash`
+to `prisma.user.create`; the plaintext password is never persisted. `createHash`
+uses Argon2id with `memoryCost: 19456`, `timeCost: 2` and `parallelism: 1`;
+`verifyHash` delegates to `argon2.verify`. These parameters are fixed because
+changing them would invalidate stored hashes. `setUserDiscordId` updates an
+existing user row when `discordId` is null or different; it first checks that no
+other row owns the id and uses `updateMany` so the write is a no-op when the id is
+already correct, never creating a duplicate user. It returns `true` when the id is
+stored (or already present) and logs a warning with both row ids before returning
+`false` on a conflict, instead of skipping the write silently.
+
+### `src/app/api/auth/[...nextauth]/route.ts`
+
+Exports `GET` and `POST` from one `NextAuth(...)` handler. It wires
+`createAuthAdapter(PrismaAdapter(prisma))`, passes `process.env` and
+`setUserDiscordId` to `buildAuthOptions` and attaches the shared Winston logger.
+Provider profiles, session policy, Discord id persistence and error routing are
+defined in `lib/authConfig.ts`.
+
+### `src/lib/routes.ts` and `src/lib/authForm.ts`
+
+`ROUTES` centralises the frontend paths (`/signin`, `/signout`, `/register`,
+`/api/auth/register`, `/`); it mirrors the NextAuth `pages` block without importing
+the server-only auth handler. `validateSignIn`, `validateRegister` and
+`hasFieldErrors` implement client-side checks that match the registration
+endpoint's limits (username 3–24, email format and 254-character cap, password
+8–128) plus password confirmation. No extra password policy is defined.
 
 ### `src/app/api/health/route.ts`
 

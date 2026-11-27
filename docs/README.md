@@ -19,12 +19,14 @@ plan is in [ROADMAP.md](../ROADMAP.md).
 | [Modules and API reference](./modules.md) | Public exports, signatures, registration keys, and edge cases for the bot, shared logger, database package, and site |
 | [Data model and storage](./data-model.md) | Prisma models, enums, relations, migration, and known gaps |
 | [Configuration](./configuration.md) | Environment variables, dotenv rules, TypeScript/ESLint/Vitest config, and automation files |
+| [Internal API notes](./api_documentation.md) | Site auth routes, OAuth callback registration, account-linking decision, error states and curl examples |
 
 ## Development and operations
 
 | Document | Content |
 | --- | --- |
 | [Development workflow](./development.md) | Local setup, package builds and distribution, bot run commands, Docker, quality commands, Git hooks, CI, and the TypeScript 6/7 setup |
+| [Contributing and conventions](./contributing.md) | Core pull-request workflow, catalog submission rule, issue reports, coding conventions and quality gates |
 | [Testing](./testing.md) | Test inventory, commands, mocking conventions, resolution aliases, and coverage caveats |
 | [Deployment and operations](./deployment.md) | Container images, Compose stack, nginx proxy, required variables, and known blockers |
 
@@ -33,7 +35,7 @@ plan is in [ROADMAP.md](../ROADMAP.md).
 | Document | Content |
 | --- | --- |
 | [Veyra Bot Metadata Specification](./specifications/bot-metadata.md) | Official `veyra.json` contract: fields, categories, versioning, licensing, validation, and submission integration |
-| [bot-metadata.schema.json](../schemas/bot-metadata.schema.json) | Official JSON Schema Draft 2020-12 used to validate `veyra.json` |
+| [bot-metadata.schema.json](../schemas/bot-metadata.schema.json) | Official JSON Schema Draft 2020-12 for `veyra.json`; compiled by the Ajv test, not yet consumed by application code |
 | [Adding Your Bot to the Veyra Catalog](./ADDING_BOTS.md) | How to submit a bot to the Veyra catalog through the official website |
 | [Veyra Bot Standard (VBS)](./bot-standard/VBS-SPECIFICATION.md) | VBS v1.0.0: required root files, variables, Docker, attribution, and open-source licensing |
 | [Bot README template](./bot-standard/README.md) | README structure expected from catalog bots |

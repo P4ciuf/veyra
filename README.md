@@ -35,12 +35,12 @@ The experience is designed to be **consistent** between the website and the Disc
 
 ## Current implementation status
 
-Veyra is in early development: this document describes the **target product**, and the feature sections below are the plan, not current behavior. What exists today:
+Veyra is in early development: this document describes the **target product**, and most feature sections below are the plan, not current behavior. Account registration and sign-in are the exception — they are implemented in `apps/site`. What exists today:
 
 - **`apps/discordBot`** — the official bot skeleton: environment validation, auto-loading of interaction modules (commands, events, buttons, menus, modals) and Discord login. Loaded handlers are stored on the client, but no `interactionCreate` dispatcher or REST command registration exists yet, and there is no distribution flow.
-- **`apps/site`** — a freshly scaffolded Next.js 16 app with a placeholder landing page and a `/api/health` endpoint used by the compose healthcheck.
+- **`apps/site`** — a Next.js 16 app with a placeholder landing page, a `/api/health` endpoint used by the compose healthcheck, and account screens at `/register` and `/signin` backed by `/api/auth/register` and a NextAuth catch-all route (email/password plus GitHub, Google and Discord OAuth).
 - **`shared`** — workspace package with the logging facade used by the bot.
-- **`database`** — Prisma 7 data layer scaffolded with the PostgreSQL driver adapter; declared as a workspace dependency by both apps but not imported by any application yet.
+- **`database`** — Prisma 7 data layer with the PostgreSQL driver adapter and a lazy `prisma` singleton; imported by the site's registration and auth routes. The bot declares it as a dependency but does not import it yet.
 - **`docs/` and `schemas/`** — project documentation, the [Veyra Bot Metadata Specification](./docs/specifications/bot-metadata.md), and the official [`veyra.json` JSON Schema](./schemas/bot-metadata.schema.json).
 
 The phased plan for everything else is tracked in [ROADMAP.md](./ROADMAP.md).
@@ -206,16 +206,16 @@ A minimal shape:
 
 Partially decided — Phase 0 of the [roadmap](./ROADMAP.md) is in progress.
 
-| Area            | Choice                                                                                   |
-| --------------- | ---------------------------------------------------------------------------------------- |
-| Frontend        | Next.js 16 (React 19, Tailwind CSS 4) — scaffolded in `apps/site`                        |
-| Official bot    | TypeScript, discord.js v14, Node.js 24 — skeleton in `apps/discordBot`                   |
-| Shared code     | TypeScript workspace package (`shared`), winston logging facade                          |
-| Package manager | pnpm 12.18.0                                                                             |
-| Backend / API   | _TBD_                                                                                    |
-| Database        | PostgreSQL via Prisma 7 (`database` package scaffolded; not wired to an application yet) |
-| Package storage | _TBD_                                                                                    |
-| Hosting         | _TBD_                                                                                    |
+| Area            | Choice                                                                           |
+| --------------- | -------------------------------------------------------------------------------- |
+| Frontend        | Next.js 16 (React 19, Tailwind CSS 4) — scaffolded in `apps/site`                |
+| Official bot    | TypeScript, discord.js v14, Node.js 24 — skeleton in `apps/discordBot`           |
+| Shared code     | TypeScript workspace package (`shared`), winston logging facade                  |
+| Package manager | pnpm 12.23.0                                                                     |
+| Backend / API   | Next.js App Router routes in `apps/site` (`/api/health`, `/api/auth/*`)          |
+| Database        | PostgreSQL via Prisma 7 (`database` package, imported by the site's auth routes) |
+| Package storage | _TBD_                                                                            |
+| Hosting         | _TBD_                                                                            |
 
 ---
 
@@ -244,7 +244,7 @@ veyra/
 
 ## Development setup
 
-Requirements: Node.js 24+, pnpm 12.18.0, Git.
+Requirements: Node.js 24+, pnpm 12.23.0, Git.
 
 ```bash
 git clone https://github.com/P4ciuf/veyra.git

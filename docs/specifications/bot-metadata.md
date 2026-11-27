@@ -449,7 +449,7 @@ The public Veyra catalog accepts only bots distributed under an OSI-approved ope
 | No license granted | `LicenseRef-Proprietary` | Not eligible. Do not use `MIT` or another license unless the project actually grants it. |
 | SPDX `NONE` or `NOASSERTION` | Syntactically accepted by the schema pattern | Not accepted for catalog submissions. Use `LicenseRef-Proprietary` for proprietary projects instead. |
 
-`LicenseRef-Proprietary` is **not** an open-source license. A bot using it must not be labeled "Open Source" in the catalog, and the submission system rejects it with `VEYRA-MANIFEST-012` when the submission targets the public catalog. Veyra is an open-source bot distribution platform; proprietary submissions are outside its current public policy.
+`LicenseRef-Proprietary` is **not** an open-source license. A bot using it must not be labeled "Open Source" in the catalog, and the planned submission system will reject it with `VEYRA-MANIFEST-012` when the submission targets the public catalog. Veyra is an open-source bot distribution platform; proprietary submissions are outside its current public policy.
 
 ---
 
@@ -912,7 +912,7 @@ Schema validation is necessary but not sufficient. A local validator cannot chec
 
 ## 14. Common validation errors
 
-The error codes below are the expected stable identifiers used by the submission system. The exact human-readable message may change, but the code, JSON Pointer location, and remediation stay stable.
+The error codes below are the expected stable identifiers for the planned submission system (Phase 7 of the roadmap); the JSON Schema validator used locally emits boolean results and does not produce these codes. The exact human-readable message may change, but the code, JSON Pointer location, and remediation stay stable.
 
 | Code | Layer | Cause | Fix |
 |---|---|---|---|

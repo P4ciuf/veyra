@@ -77,7 +77,7 @@ The following variables are mandatory:
 
 Additional variables are allowed and must be documented. `.env.example` must contain placeholders, never real secrets. `.env` must be excluded from version control and must not be copied into public images.
 
-The same variables must be declared in the `variables` array of `veyra.json`, which Veyra uses to build the distribution configuration form. Mark sensitive variables with `"secret": true` and never give them a default. Keep `.env.example` and the manifest in sync; see [Veyra Bot Metadata Specification §7](../specifications/bot-metadata.md#7-configuration-variables).
+The same variables must be declared in the `variables` array of `veyra.json`; the planned distribution flow will use that array to build the configuration form (Phase 7 of the [ROADMAP](../../ROADMAP.md#phase-7--submission-system)). Mark sensitive variables with `"secret": true` and never give them a default. Keep `.env.example` and the manifest in sync; see [Veyra Bot Metadata Specification §7](../specifications/bot-metadata.md#7-configuration-variables).
 
 ## 6. Global Discord commands
 
@@ -114,6 +114,8 @@ Every bot must include a working `Dockerfile` at the repository root. It must:
 - Avoid embedding secrets in image layers.
 
 The programming language is unrestricted. Multi-stage builds are encouraged where appropriate. A Compose file may be supplied but does not replace the required Dockerfile.
+
+The `Dockerfile` committed with this standard is a starter template, not a runnable image: its final command deliberately exits with an error. Replace it with the bot's real production startup command before submission so the checklist item "Docker image builds and the bot starts successfully" can pass.
 
 ## 9. Open-source licensing
 

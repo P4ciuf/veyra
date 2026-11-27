@@ -2,8 +2,9 @@
 
 This document explains how to report security vulnerabilities in Veyra and what
 reporters can expect in return. Veyra is in early development: only the code in
-this repository (the Discord bot, the website scaffold, shared packages, and the
-Prisma data layer) exists today, and no version has been released yet.
+this repository (the Discord bot, the website with account registration and
+sign-in, shared packages, and the Prisma data layer) exists today, and no version
+has been released yet.
 
 ## Supported Versions
 

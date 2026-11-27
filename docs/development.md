@@ -12,7 +12,7 @@ component map in [Architecture](./architecture.md).
 ## Prerequisites
 
 - Node.js 24 or newer (CI uses Node.js 24, matching the bot Dockerfile).
-- pnpm 12.18.0. The version is pinned in the `devEngines` field of the root `package.json`.
+- pnpm 12.23.0. The version is pinned in the `devEngines` field of the root `package.json`; CI currently pins 12.18.0.
 - Git, required by Husky to install the hooks.
 
 ## Install dependencies
@@ -115,15 +115,20 @@ A multi-service stack is defined in the root `docker-compose.yaml`:
 - `discord-bot` — bot runtime built from `apps/discordBot/Dockerfile` with
   `target: runtime`, containing the compiled `dist/` plus production dependencies
   (workspace `shared` and `database` included). Both application Dockerfiles copy the
-  `database` workspace manifest, install with `--ignore-scripts`, then copy the sources
-  and run an explicit topological build before `pnpm deploy`. The bot has no healthcheck
-  because it exposes no HTTP server.
+  workspace sources, install with `--ignore-scripts`, then build `shared` and
+  `database` before the application and restore the generated Prisma client after
+  `pnpm deploy`; the site also needs `docs/brand-identity/tokens/tokens.css` and
+  restores Turbopack's hashed externals. The site build needs no database URL:
+  the Prisma singleton is created on first use at runtime. The bot has no
+  healthcheck because it exposes no HTTP server.
 
 ### Preparing the stack
 
 1. Copy `.env.example` to `.env` at the repository root. `POSTGRES_*` is interpolated
    by Compose into the db service (environment and healthcheck);
-   `DATABASE_CONNECTION_STRING` is required by the `site` service; `DISCORD_TOKEN`,
+   `DATABASE_CONNECTION_STRING` and the OAuth client IDs/secrets are required by the
+   `site` service; `NEXTAUTH_URL` and `NEXTAUTH_SECRET` are passed through, and auth
+   routes return 500 until a secret is supplied. `DISCORD_TOKEN`,
    `DISCORD_CLIENT_ID`, and `NODE_ENV` are injected into the bot container. With
    placeholder Discord credentials the bot logs the login error instead of crashing;
    the `unless-stopped` policy restarts it if the process exits.
@@ -234,7 +239,7 @@ Bypass a hook only in emergencies with `git commit --no-verify` or `git push --n
 `.github/workflows/ci.yml` runs on pushes to `main` and on every pull request:
 
 1. Checkout the repository.
-2. Install pnpm 12.18.0 and Node.js 24 with the pnpm store cache.
+2. Install pnpm 12.18.0 (the version pinned in `.github/workflows/ci.yml`; the repository pin and Docker images use 12.23.0) and Node.js 24 with the pnpm store cache.
 3. Install dependencies with `pnpm install --frozen-lockfile`.
 4. Run `pnpm run lint`.
 5. Run `pnpm run typecheck`.

@@ -215,4 +215,4 @@ The logo has a transparent background and is placed identically in both themes (
 
 - Mandatory colors, the brand gradient, the type scale, the spacing scale and the radius scale are **frozen** for v1.x. Changes require a major version bump.
 - Additions (new semantic tokens, components) are allowed in minor versions and must define all applicable states, contrast ratios and accessibility behavior.
-- Tokens in `tokens/*.json` are the source of truth. `tokens/tokens.css` expresses the palette, type scale, spacing, sizing, radius, shadows, motion and z-layers, but omits named layout/breakpoint and font-weight tokens (two hard-coded media queries override type sizes); no generator script is committed, so update both together.
+- Tokens in `tokens/*.json` are the source of truth. `tokens/tokens.css` expresses the palette, type scale, spacing, sizing, radius, shadows, motion and z-layers, but omits named layout/breakpoint, font-weight, border-width and focus-shadow tokens (two hard-coded `max-width` media queries override type sizes and line heights); no generator script is committed, so update both together.

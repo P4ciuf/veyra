@@ -180,14 +180,16 @@ generated copy's name and description.
 
 If your bot requires environment variables, declare them in the
 `variables` array of `veyra.json` and list them in `.env.example` with safe
-placeholders. Veyra builds the dynamic configuration form from the
-manifest. Variables marked `secret` are handled as sensitive values:
-Veyra must not log them, display them, or store them in plaintext in the
-catalog. Do not hard-code credentials or include your personal tokens in
-the distributed source.
+placeholders. The planned distribution flow will build the dynamic
+configuration form from the manifest. Variables marked `secret` must be
+handled as sensitive values: not logged, not displayed and not stored in
+plaintext in the catalog. Do not hard-code credentials or include your
+personal tokens in the distributed source.
 
 The original repository should remain unchanged by the distribution
-process.
+process. Note that the submission system and distribution form are not
+implemented yet (Phase 7 of the [ROADMAP](../ROADMAP.md)); they are
+described here as the contract contributors should prepare for.
 
 ## Submission checklist
 

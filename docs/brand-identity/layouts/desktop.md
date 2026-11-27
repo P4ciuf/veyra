@@ -13,7 +13,10 @@ Related: [Tablet](tablet.md) · [Mobile](mobile.md) · [Navigation](../component
 | Desktop | 1024px+ | `desktop-min` = 1024 |
 | Wide | 1280px+ | `wide-min` = 1280 |
 
-Mobile-first CSS: base styles target mobile; enhance with `@media (min-width: 640px)` and `@media (min-width: 1024px)`.
+Layout guidance is mobile-first: write base styles for the smallest viewport and
+add larger breakpoints as needed. The committed `tokens/tokens.css` currently takes
+the opposite approach for the type scale: it declares desktop sizes as the base and
+overrides them with `@media (max-width: 1023px)` and `@media (max-width: 639px)`.
 
 ## Container and grid
 

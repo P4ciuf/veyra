@@ -17,13 +17,14 @@ Veyra is a pnpm workspace (`pnpm-workspace.yaml`). Four packages are defined:
 | Workspace directory | Package name | Role | Current state |
 | --- | --- | --- | --- |
 | `apps/discordBot` | `discord-bot` | Official Discord bot | Runnable skeleton: env validation, module auto-loading, login, graceful shutdown |
-| `apps/site` | `site` | Official website | Next.js 16 scaffold: placeholder landing page and a health endpoint |
+| `apps/site` | `site` | Official website | Next.js 16 app: placeholder landing page, sign-in/register screens, auth API routes and a health endpoint |
 | `shared` | `shared` | Cross-package utilities | Winston logger facade, imported by the bot as `import { logger } from "shared"` |
-| `database` | `database` | Prisma data layer | Generated client plus PostgreSQL driver adapter; not imported by any application |
+| `database` | `database` | Prisma data layer | Generated client, PostgreSQL driver adapter and lazy `prisma` singleton; imported by the site |
 
-Both applications declare `database` as a workspace dependency, and the bot also
-declares `shared`. No application imports `database` yet. There are no other
-workspace packages.
+Both applications declare `database` and `shared` as workspace dependencies. The
+site imports `database` from its registration route, its NextAuth catch-all route
+and its auth service; the bot declares the dependency but does not import it.
+There are no other workspace packages.
 
 Supporting directories at the repository root:
 
@@ -53,15 +54,16 @@ graph TD
     D --> I[discord.js Client + gateway]
     J[apps/site] --> K[GET /api/health]
     J --> L[Next.js App Router]
-    M[database] --> N[Prisma 7 + @prisma/adapter-pg]
+    J --> P[Auth routes: /api/auth/register + NextAuth catch-all]
+    P --> M
+    M --> N[Prisma 7 + @prisma/adapter-pg]
     M --> O[PostgreSQL]
-    J -. declared dependency, not imported .-> M
     A -. declared dependency, not imported .-> M
 ```
 
-The dashed edges are dependency declarations without any application import: the
-`database` package is wired into the workspace but is not used by the bot or the
-site at runtime.
+The dashed edge is a dependency declaration without an application import: the bot
+declares `database` but does not use it. The site imports the package from its
+registration route, NextAuth catch-all route and auth service (solid edges).
 
 ## Bot startup and runtime flow
 
@@ -96,13 +98,21 @@ Two important limits of the current skeleton:
 
 `apps/site` is a Next.js 16 App Router application. `src/app/layout.tsx` provides the
 root layout (metadata, Geist font CSS variables, global stylesheet), and
-`src/app/page.tsx` renders a placeholder "Hello World" landing page at `/`. The only
-API route is `src/app/api/health/route.ts`, whose `GET` handler returns
-`Response.json({ ok: true })`. This endpoint is used by the compose healthcheck for
+`src/app/page.tsx` renders a placeholder landing page at `/` with a Sign In button. Two
+additional App Router pages, `/signin` and `/register`, mount client forms built
+from shared components in `src/components/` and the path constants in
+`src/lib/routes.ts`. The forms validate locally; the sign-in form offers the
+existing credentials login plus "Continue with GitHub/Google/Discord" buttons that
+start a NextAuth redirect to `/api/auth/callback/<provider>` and return to `/`.
+`/signin` also renders generic messages for `?error=` codes. `src/lib/authConfig.ts`
+owns the server-side provider registration, scopes and session policy; the
+`[...nextauth]` route wires it to the Prisma adapter. `src/app/api/health/route.ts`
+returns `Response.json({ ok: true })` and is used by the compose healthcheck for
 the `site` service.
 
 The Next.js configuration enables `cacheComponents`, `partialPrefetching`, and a
-Turbopack rule that processes `*.css` with `@tailwindcss/turbopack`.
+Turbopack rule that processes `*.css` with `@tailwindcss/turbopack`, excluding
+`*.module.css` so CSS Modules keep Next's generated class-name mapping.
 
 ## Shared utilities
 
@@ -115,11 +125,13 @@ module was imported with `NODE_ENV=development`.
 
 ## Data layer flow
 
-`database/src/index.ts` re-exports the generated `@prisma/client` surface and
-`PrismaPg`. The client singleton lives in a separate module,
-`database/src/setup.ts`, which reads `DATABASE_CONNECTION_STRING`, builds a
-`PrismaPg` adapter, and constructs `PrismaClient`. That module throws at import time
-when the connection string is missing or empty. The Prisma CLI configured in
+`database/src/index.ts` re-exports the generated `@prisma/client` surface,
+`PrismaPg` and the `prisma` singleton. The singleton lives in a separate module,
+`database/src/setup.ts`, and is lazily initialized: on the first property access
+it reads `DATABASE_CONNECTION_STRING`, builds a `PrismaPg` adapter, and constructs
+one `PrismaClient`. Importing the barrel has no such side effects, so Next.js can
+evaluate route modules during `next build` without runtime credentials; the guard
+throws on first use when the connection string is missing or empty. The Prisma CLI configured in
 `prisma.config.ts` uses the same variable from `database/.env` when run through the
 package scripts. See [Configuration](./configuration.md#database-variables-in-detail) and
 [Data model and storage](./data-model.md).
@@ -131,19 +143,24 @@ package scripts. See [Configuration](./configuration.md#database-variables-in-de
 the two applications use the repository root as context and their own Dockerfiles;
 both images compile in a `node:24-alpine` build stage and deploy production
 dependencies into a `node:24-alpine` runtime stage without baking in `.env` files.
+The site image also carries the brand token stylesheet imported by `globals.css`;
+both images build `shared` and `database` first and restore the generated Prisma
+client after `pnpm deploy` (the site restores Turbopack's hashed externals too).
 
-Earlier blockers were fixed: both application Dockerfiles now copy the `database`
-workspace manifest, nginx defines `$connection_upgrade` in an active `map`, and the
-bot has no healthcheck because it exposes no HTTP server. HTTPS is still disabled, so
+Earlier blockers were fixed: both application Dockerfiles now copy the workspace
+sources, nginx defines `$connection_upgrade` in an active `map`, and the bot has no
+healthcheck because it exposes no HTTP server. HTTPS is still disabled, so
 port 443 has no listener and the mounted `ssl/` files are not read yet. See
 [Development workflow](./development.md#docker) for the full analysis and stack
 commands, and [Deployment and operations](./deployment.md) for the container details.
 
 ## Relationship to the product plan
 
-The distribution wizard, catalog, accounts, submissions, tickets, reviews, private
-testing, and the 72-hour download flow are described in the root README and the
-roadmap. None of them is implemented in application code today. The only contract
+The distribution wizard, catalog, submissions, tickets, reviews, private testing,
+and the 72-hour download flow are described in the root README and the roadmap.
+None of them is implemented in application code today. Account registration and
+sign-in are implemented in `apps/site`; see [Internal API notes](./api_documentation.md).
+The only contract
 that has been materialized for those future features is the `veyra.json` manifest:
 its [specification](./specifications/bot-metadata.md) and
 [JSON Schema](../schemas/bot-metadata.schema.json). There is no submission or

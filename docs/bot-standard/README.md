@@ -73,14 +73,20 @@ This file contains general, user-editable bot settings. Document every supported
 | `links.veyra_website` | string | Official Veyra website URL. |
 | `links.veyra_discord` | string | Official Veyra Discord invite URL. |
 | `logging.level` | string | Logging verbosity. |
+| `standard.name` | string | Name of the standard this template follows: `Veyra Bot Standard`. |
+| `standard.version` | string | VBS version followed by the bot, for example `1.0.0`. |
 
 Do not put secrets, tokens, passwords, or private keys in this file.
 
 ### Veyra metadata manifest
 
-This repository also contains `veyra.json` in the root. It declares the submission and catalog metadata: name, description, category, version, license, repository, runtime, and environment variables. It is not a runtime configuration file.
+A submitted bot repository must also contain `veyra.json` in its root. It declares the submission and catalog metadata: name, description, category, version, license, repository, runtime, and environment variables. It is not a runtime configuration file. The template directory in this documentation set does not ship a `veyra.json`; copy a valid example from the [metadata specification](../specifications/bot-metadata.md) into the bot repository root.
 
 Keep it consistent with this README, `.env.example`, and `LICENSE`. The manifest must validate against the [official JSON Schema](../../schemas/bot-metadata.schema.json); see the [Veyra Bot Metadata Specification](../specifications/bot-metadata.md) for every field and example.
+
+### VBS version
+
+State the Veyra Bot Standard version followed by the repository (currently `1.0.0`) in the README or other documentation, as required by [VBS §12](./VBS-SPECIFICATION.md#12-versioning). `global_settings.json` records the same value in `standard.version`.
 
 ## Discord application commands
 
@@ -110,7 +116,7 @@ Every Veyra-distributed bot must follow these attribution rules:
 
 ## Run with Docker
 
-A working, project-specific `Dockerfile` is mandatory. It must install or copy everything required and start the bot using the correct command for its language and framework.
+A working, project-specific `Dockerfile` is mandatory in a submitted bot. It must install or copy everything required and start the bot using the correct command for its language and framework. The `Dockerfile` in this template directory is only a starting point: it contains TODO markers and a placeholder command that exits with status 1, so it must be replaced before submission (see [VBS §8](./VBS-SPECIFICATION.md#8-docker-requirement)).
 
 ### Build
 

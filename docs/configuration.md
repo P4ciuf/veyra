@@ -9,11 +9,13 @@ private configuration values.
 | Requirement | Source |
 | --- | --- |
 | Node.js 24 | CI workflow and both Dockerfiles use `node:24`; README documents 24+ |
-| pnpm 12.18.0 | `devEngines.packageManager` in the root `package.json`, the pinned version in `pnpm-lock.yaml`, CI setup, and Docker installs |
+| pnpm 12.23.0 | `devEngines.packageManager` in the root `package.json` and the global install in both Dockerfiles |
 
 Use pnpm only; npm and yarn are not supported by the workspace configuration. The
 `devEngines` entry uses `onFail: download`, so a mismatched local pnpm is replaced
-automatically.
+automatically. The CI workflow currently pins pnpm 12.18.0, so CI installs a
+different version from the repository pin and the Docker images; that mismatch
+should be resolved in CI.
 
 ## Environment variables
 
@@ -26,13 +28,35 @@ bots, not for this repository's official bot.
 | Variable | Consumer | Required | Purpose |
 | --- | --- | --- | --- |
 | `DISCORD_TOKEN` | `apps/discordBot/src/config/env.ts`; Compose passes it to the bot container | Yes, for the bot | Discord bot token used by `dsClient.login()`. The process exits with status 1 when it is missing. |
-| `DISCORD_CLIENT_ID` | `apps/discordBot/src/config/env.ts`; Compose passes it to the bot container | Yes, for the bot | Discord application id. Currently only checked for presence; no command registration consumes it. |
+| `DISCORD_CLIENT_ID` | `apps/discordBot/src/config/env.ts`; `apps/site/src/lib/authConfig.ts` via `process.env`; Compose passes it to both containers | Yes, for the bot and Discord OAuth | Discord application id: checked for presence by the bot (no command registration consumes it there) and passed as the Discord OAuth client id by the site. |
 | `NODE_ENV` | `apps/discordBot/src/config/env.ts` and `shared/src/utils/logger.ts`; Compose passes it to `site` and `discord-bot` | No | Defaults to `production`. Set to `development` to enable `debug` logging. Captured when the logger module is imported. |
-| `DATABASE_CONNECTION_STRING` | `database/src/env.ts`, `database/prisma.config.ts`; Compose passes it to the `site` service | Yes, for database work and the `site` service | PostgreSQL connection string for the Prisma driver adapter and the Prisma CLI. |
+| `DATABASE_CONNECTION_STRING` | `database/src/env.ts`, `database/prisma.config.ts`; Compose passes it to the `site` service | Yes, for database work and the `site` service | PostgreSQL connection string for the Prisma driver adapter and the Prisma CLI. The site image build sets no value: the lazy client defers configuration until the first database call, and Compose injects the real value at runtime. |
+| `DISCORD_CLIENT_SECRET` | `apps/site/src/lib/authConfig.ts` via `process.env`; Compose passes it to `site` | Yes, for Discord OAuth | Discord OAuth client secret. |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | `apps/site/src/lib/authConfig.ts` via `process.env`; Compose passes them to `site` | Yes, for GitHub OAuth | GitHub OAuth application credentials. No aliases are needed. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | `apps/site/src/lib/authConfig.ts` via `process.env`; Compose passes them to `site` | Yes, for Google OAuth | Google OAuth credentials. |
+| `NEXTAUTH_URL` | `apps/site/src/lib/authConfig.ts` via `process.env`; NextAuth; Compose passes it to `site` | Yes, for OAuth | Public base URL used to build callback URLs; its protocol also decides whether cookies are `Secure` (HTTP means non-`Secure` cookies). |
+| `NEXTAUTH_SECRET` | `apps/site/src/lib/authConfig.ts` via `process.env`; NextAuth; Compose passes it to `site` | Yes, for auth routes | Secret used to sign session tokens. Compose passes an empty value by default, so `/api/auth/*` fails until a random value is supplied in the root `.env`. |
 | `POSTGRES_USER` | `docker-compose.yaml` (`db` service and healthcheck) | No | Defaults to `root`. |
 | `POSTGRES_PASSWORD` | `docker-compose.yaml` (`db` service) | Yes, for Compose | Interpolated from the root `.env`; Compose fails when it is undefined. |
 | `POSTGRES_DB` | `docker-compose.yaml` (`db` service and healthcheck) | No | Defaults to `veyra-main`. |
 | `SITE_API_URL` | `docker-compose.yaml` (`discord-bot` service) | No | Set to `http://site:3000`, but no application code reads it. |
+
+### OAuth callback URLs to register
+
+NextAuth derives the callback from `NEXTAUTH_URL`; the app never reads a
+per-provider callback setting from the environment. Register these exact URLs:
+
+| Provider | Where to register | Redirect / callback URL |
+| --- | --- | --- |
+| GitHub | OAuth App settings → Authorization callback URL | `<NEXTAUTH_URL>/api/auth/callback/github` |
+| Google | Cloud console → Credentials → OAuth client → Authorized redirect URIs | `<NEXTAUTH_URL>/api/auth/callback/google` |
+| Discord | Developer portal → OAuth2 → Redirects | `<NEXTAUTH_URL>/api/auth/callback/discord` |
+
+The requested scopes are limited to identity and email: `read:user user:email`
+(GitHub), `openid email profile` (Google) and `identify email` (Discord).
+For a local HTTP run set `NEXTAUTH_URL=http://localhost:3000`; cookies are then
+not marked `Secure`. Missing or invalid client credentials redirect the user to
+`/signin?error=Configuration` instead of crashing the route.
 
 A `.env` file based on the template looks like this (placeholders only):
 
@@ -43,6 +67,13 @@ POSTGRES_PASSWORD=<PASSWORD>
 POSTGRES_DB=<DATABASE>
 DISCORD_TOKEN=<DISCORD_BOT_TOKEN>
 DISCORD_CLIENT_ID=<DISCORD_APPLICATION_ID>
+DISCORD_CLIENT_SECRET=<DISCORD_OAUTH_SECRET>
+GITHUB_CLIENT_ID=<GITHUB_OAUTH_CLIENT_ID>
+GITHUB_CLIENT_SECRET=<GITHUB_OAUTH_SECRET>
+GOOGLE_CLIENT_ID=<GOOGLE_OAUTH_CLIENT_ID>
+GOOGLE_CLIENT_SECRET=<GOOGLE_OAUTH_SECRET>
+NEXTAUTH_URL=<PUBLIC_SITE_URL>
+NEXTAUTH_SECRET=<RANDOM_SESSION_SECRET>
 NODE_ENV=
 ```
 
@@ -64,19 +95,22 @@ not update it.
 
 `database/prisma/schema.prisma` intentionally declares no datasource `url`. Prisma 7
 reads it from `prisma.config.ts`, which sets `datasource.url` from
-`DATABASE_CONNECTION_STRING`. At runtime, `database/src/setup.ts` validates the same
-variable and throws `DATABASE_URL not found in environment variables` when it is
-missing or empty. That message is historical; the variable actually read is
-`DATABASE_CONNECTION_STRING`.
+`DATABASE_CONNECTION_STRING`. At first use, `database/src/setup.ts` validates the
+same variable and throws `DATABASE_URL not found in environment variables` when it
+is missing or empty. That message is historical; the variable actually read is
+`DATABASE_CONNECTION_STRING`. The live `process.env` value wins over the
+`ENV` snapshot, which can be captured at build time.
 
-The `database` barrel (`database/src/index.ts`) does not read this variable and does
-not construct a client, so importing it is safe without database configuration.
+The `database` barrel (`database/src/index.ts`) re-exports the `prisma` singleton
+from `src/setup.ts`. Both the barrel and the site's NextAuth route can therefore be
+imported without a connection string: the singleton is a proxy that constructs the
+client only when a property is read at runtime.
 
 ## Workspace and package configuration
 
 `pnpm-workspace.yaml` includes `apps/*`, `shared`, and `database`, sets
-`injectWorkspacePackages: true`, allows build scripts for `@prisma/engines`, `esbuild`,
-and `prisma`, and declares two security overrides: `effect@3.22.1` (Prisma's transitive
+`injectWorkspacePackages: true`, allows build scripts for `@prisma/engines`, `argon2`,
+`esbuild`, and `prisma`, and declares two security overrides: `effect@3.22.1` (Prisma's transitive
 pin is affected by GHSA-7589-6fvf-x4pw) and `minimatch@11.0.1` (GHSA-g3hv-75wg-m249 in
 the ESLint toolchain). Both are applied through pnpm 12's `overrides` field in this
 file; the older `pnpm.overrides` field in `package.json` is ignored by pnpm 12.
@@ -85,7 +119,7 @@ file; the older `pnpm.overrides` field in `package.json` is ignored by pnpm 12.
 | --- | --- |
 | `package.json` (root) | Workspace scripts: `lint`, `format`, `typecheck`, `test`, `test:watch`, `test:coverage`, `docker:*`, and `clear:*`; `prepare` installs Husky hooks |
 | `apps/discordBot/package.json` | `dev` (tsx watch), `start` (`node dist/main.js`), `build` (tsc), `docker:build`, `docker:start`; declares `shared` and `database` as workspace dependencies |
-| `apps/site/package.json` | `dev`, `build`, `start` (Next.js); declares `database` as a workspace dependency |
+| `apps/site/package.json` | `dev`, `build`, `start` (Next.js); declares `next-auth`, `@auth/prisma-adapter`, `argon2` and the `database`/`shared` workspace packages |
 | `shared/package.json` | `dist/index.js` entry point with an `exports` map, `files: ["dist"]`, `build`, `prepack`, `prepare: pnpm run build` |
 | `database/package.json` | `dist/index.js` entry point with an `exports` map, `files: ["dist"]`, Prisma scripts (`generate`, `push`, `migrate`, `studio`, `format`, `prebuild`), `build` (clears `dist`, then `tsc -p tsconfig.build.json`), `prepack`, `prepare: pnpm run build` |
 

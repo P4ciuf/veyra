@@ -2,13 +2,16 @@
 
 This document describes the Prisma schema, the generated client, and how the data
 layer is intended to be used. The schema is split across
-`database/prisma/schema/*.prisma` files and applied through the initial SQL migration
-in `database/prisma/migrations/`.
+`database/prisma/schema/*.prisma` files and applied through four SQL migrations in
+`database/prisma/migrations/`.
 
-**Current status:** the `database` package is a scaffold. Both applications declare
-it as a workspace dependency, but no application code imports it, so none of the
-models below is read or written by the bot or the site today. The data model reflects
-the planned features in [ROADMAP.md](../ROADMAP.md).
+**Current status:** the site reads and writes `User` rows through
+`apps/site/src/services/auth.ts` (registration and credentials login), while the
+NextAuth handler in `apps/site/src/app/api/auth/[...nextauth]/route.ts` uses the
+Prisma adapter for `Account`, `Session` and `VerificationToken`-shaped data. The
+remaining models describe the planned features in [ROADMAP.md](../ROADMAP.md) and
+are not used by application code today. JWT sessions are enabled, so the `Session`
+table is not written by the running site.
 
 ## Connection and client construction
 
@@ -42,13 +45,19 @@ erDiagram
     User ||--o{ botAddRequest : "discordUserId"
     User ||--o{ AuthorizationRequest : "discordUserId"
     User ||--o{ Warn : "warned / issuer"
+    User ||--o{ Account : "provider + providerAccountId"
+    User ||--o{ Session : "sessionToken"
     BotCategory ||--o{ Bot : "categoryName"
     PrivateTestCategory ||--o{ PrivateTestChannel : "discordId"
 ```
 
 Most primary keys are `String` values generated with `cuid()`. `Warn.id` is the only
-`Int` key and uses `autoincrement()`. All models except `Warn` carry `createdAt`
-(`@default(now())`) and `updatedAt` (`@updatedAt`) fields.
+`Int` key and uses `autoincrement()`. The platform models (`User`, `BotCategory`,
+`Bot`, `botAddRequest`, `AuthorizationRequest`, `PrivateTestCategory`,
+`PrivateTestChannel`, `Reviews`, `Ticket`, `TicketMessage` and `Warn`) carry
+`createdAt` (`@default(now())`) and `updatedAt` (`@updatedAt`) fields. The three
+NextAuth adapter models (`Account`, `Session`, `VerificationToken`) do not declare
+timestamps.
 
 ## Models
 
@@ -59,20 +68,57 @@ A platform user, optionally linked to a Discord account.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `id` | `String` | Primary key, `cuid()` |
-| `discordId` | `String?` | Unique; nullable until the Discord link exists |
+| `discordId` | `String?` | Unique; stable Discord snowflake id stored as a string to avoid precision loss; `null` until a Discord sign-in links it |
 | `username` | `String` | Required |
 | `avatarHash` | `String?` | Optional |
+| `avatarUrl` | `String?` | Optional; mirrors `image` for site display |
 | `email` | `String?` | Optional; unique |
-| `password` | `String?` | Optional; no application code reads it yet |
+| `emailVerified` | `DateTime?` | Written by the NextAuth adapter; `null` for OAuth users |
+| `image` | `String?` | Avatar URL written by the NextAuth adapter; mirrored into `avatarUrl` |
+| `passwordHash` | `String?` | Argon2 hash used by the credentials provider |
 | `authorizedDeveloper` | `Boolean` | Defaults to `false` |
 | `role` | `UserRoles` | Defaults to `USER` |
 | `createdAt`, `updatedAt` | `DateTime` | Timestamps |
 
 Relations: `tickets`, `ticketMessages`, `reviews`, `addBotRequests`,
-`AuthorizationRequests`, and two named `Warn` relations (`warned_user` for warnings
-issued against the user, `warned_by_user` for warnings the user issued). Several
-other models reference `discordId`, so the nullable link is effectively required for
-those records.
+`AuthorizationRequests`, two named `Warn` relations (`warned_user` for warnings
+issued against the user, `warned_by_user` for warnings the user issued), plus
+`accounts` and `sessions` owned by the NextAuth adapter. Several other models
+reference `discordId`, so the nullable link is effectively required for those
+records.
+
+Discord sign-in writes the account id from the OAuth profile into `discordId`.
+The Discord `profile()` mapper keeps the id, `createAuthAdapter` forwards it into
+the first `User` insert, and the `signIn` event in `buildAuthOptions` calls
+`setUserDiscordId` (`src/services/auth.ts`) for returning and explicitly linked
+accounts, where NextAuth reuses the row without calling `updateUser`. That helper
+never inserts a user and skips the write if another row already owns the id, so
+the unique index and the foreign keys pointing at the column stay intact; that
+conflict is logged with both row ids instead of being silent. A failed write is
+logged as well but does not interrupt an otherwise successful OAuth login.
+GitHub, Google and credentials users keep `discordId` null.
+
+### `Account`
+
+An external OAuth identity linked to a `User`: one row per provider and provider
+account id, with a composite primary key `(provider, providerAccountId)`. `userId`
+references `User.id` with `ON DELETE CASCADE`. It stores the tokens NextAuth needs
+(`access_token`, `refresh_token`, `id_token`, `expires_at`, `token_type`, `scope`,
+`session_state`, all nullable). GitHub, Google and Discord sign-ins create or reuse
+these rows. `type` is `oauth` for the three providers.
+
+### `Session`
+
+A database session owned by the NextAuth adapter: `sessionToken` is unique,
+`userId` references `User.id` with `ON DELETE CASCADE`, and `expires` is a timestamp.
+The site uses JWT sessions because the Credentials provider cannot use database
+sessions, so no rows are written today; the table is kept for adapter parity.
+
+### `VerificationToken`
+
+Passwordless-email token store required by the adapter: `identifier`, `token`
+(unique) and `expires`, with a composite unique index on `(identifier, token)`.
+No email provider is registered, so the table is unused.
 
 ### `UserRoles` (enum)
 
@@ -208,7 +254,7 @@ The two relations are named `warned_user` and `warned_by_user` to disambiguate t
 
 ## Migration
 
-Two migrations are present in `database/prisma/migrations/`:
+Five migrations are present in `database/prisma/migrations/`:
 
 - `20261120083712_create_initial_schema/migration.sql` creates the four enums,
   eleven tables, five unique indexes (`BotCategory.name`,
@@ -216,7 +262,22 @@ Two migrations are present in `database/prisma/migrations/`:
   `Ticket.discordChannelId`, `User.discordId`), and the foreign keys described
   above.
 - `20261124103140_add_email_and_password_to_user/migration.sql` adds the nullable
-  `email` and `password` columns to `User` and a unique index on `User.email`.
+  `email` and `password` columns to `User` and a unique index on `User.email`; the
+  next migration renames `password` to `passwordHash`.
+- `20261126210534_add_avatar_url_and_rename_password_to_password_hash/migration.sql`
+  drops `password`, adds `avatarUrl` and `passwordHash`.
+- `20261126233000_add_nextauth_adapter_models/migration.sql` adds `emailVerified` and
+  `image` to `User` and creates `Account`, `Session` and `VerificationToken` with
+  their indexes and foreign keys. Apply it with `pnpm --filter database migrate`
+  against a local database before starting the site's auth routes.
+- `20261127120000_backfill_discord_id_from_accounts/migration.sql` fills
+  `User.discordId` for existing users that already have a Discord `Account` row:
+  `Account.providerAccountId` is the stable Discord id that NextAuth uses for
+  account lookup. Users with no Discord identity keep NULL and are filled on
+  their next Discord sign-in. When several Discord accounts are linked, the
+  smallest id is chosen; ids already owned by another row are left untouched so
+  the unique index and its foreign keys stay valid. The statement is idempotent
+  and can be re-run safely.
 
 `migration_lock.toml` records `provider = "postgresql"`.
 
@@ -228,8 +289,8 @@ Two migrations are present in `database/prisma/migrations/`:
 - `Bot` stores one `version` string rather than independent versions.
 - The lowercase `botAddRequest` and plural `Reviews` identifiers are historical and
   are kept to avoid rename-only migrations.
-- No application code uses any of these models yet, so the model has not been
-  validated against real usage.
+- OAuth users keep `emailVerified` null; verified-email account linking is not
+  performed automatically (see [Internal API notes](./api_documentation.md)).
 
 ## Related documents
 
