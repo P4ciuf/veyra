@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "07b0ecb944c0442a",
+        "id": "0a402f62cf5ff7de",
         "type": "tabs",
         "children": [
           {
-            "id": "3c64e80a5d110c44",
+            "id": "a442c27f230c513f",
             "type": "leaf",
             "state": {
               "type": "graph",
@@ -181,21 +181,23 @@
       "bases:Crea nuova Base": false
     }
   },
-  "active": "3c64e80a5d110c44",
+  "active": "a442c27f230c513f",
   "lastOpenFiles": [
-    "shared/dist/utils/logger.js",
-    "shared/dist/utils/logger.d.ts",
-    "shared/dist/utils",
-    "database/prisma/migrations/20261120083712_create_initial_schema/migration.sql",
-    "database/prisma/migrations/migration_lock.toml",
-    "database/prisma/migrations/20261120083712_create_initial_schema",
-    "database/prisma/migrations",
-    "coverage/shared/src/utils/logger.ts.html",
-    "coverage/shared/src/utils/index.html",
-    "coverage/shared/src/utils",
-    "coverage/shared/src/index.ts.html",
+    "_tmp_18400_1ba41b98",
+    "database/dist/setup.d.ts",
+    "database/dist/setup.js",
+    "database/dist/index.js",
+    "database/dist/index.d.ts",
+    "database/dist/env.js",
+    "database/dist/env.d.ts",
+    "database/dist",
+    "tests/apps/site/discord-login-flow.test.ts",
+    "database/prisma/migrations/20261127120000_backfill_discord_id_from_accounts/migration.sql",
+    "database/prisma/migrations/20261127120000_backfill_discord_id_from_accounts",
     "coverage/sort-arrow-sprite.png",
     "coverage/favicon.png",
+    "docs/contributing.md",
+    "docs/README.md",
     "docs/brand-identity/brand/Screenshot_2026-11-17_003237.png",
     "tokens.md",
     "docs/brand-identity/brand/logo.png",
@@ -216,12 +218,10 @@
     "docs/bot-standard/README.md",
     "docs/brand-identity/README.md",
     "docs/brand-identity/accessibility.md",
-    "docs/README.md",
     "docs/development.md",
     "docs/ADDING_BOTS.md",
     "logs/docs/brand-identity/components/navigation.md",
     "logs/docs/brand-identity/components/inputs.md",
-    "logs/docs/brand-identity/components/feedback.md",
-    "logs/docs/brand-identity/components/dialogs.md"
+    "logs/docs/brand-identity/components/feedback.md"
   ]
 }

@@ -16,6 +16,8 @@
 tests
 **/tests
 docs
+# globals.css imports this sheet through a relative path, so it must stay in the context.
+!docs/brand-identity/tokens/tokens.css
 LICENSE
 docker-compose.yaml
 eslint.config.mjs
