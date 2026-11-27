@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.2.0]
 
 ### Added
 
@@ -55,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   thirteen commits (`08f676e` through `7a62ddc`), and only the initial commit added
   `LICENSE`.
 - 2026-11-24 — Corrected `SECURITY.md`, which claimed `CHANGELOG.md` contained
-  only an `[Unreleased]` section; the release work was recorded under `[0.1.0]`.
+  only an `[Unreleased]` section; the release work was recorded under `[v0.1.0]`.
 - 2026-11-24 — Extended `docs/data-model.md` with the optional `email` and
   `passwordHash` fields on `User` (the column had previously been named `password`)
   and the follow-up migrations present in `database/prisma/migrations/`.
@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository; the remaining bot-standard templates still document the required
   repository files.
 
-## [0.1.0]
+## [v0.1.0]
 
 No tagged release exists yet, so every change below is unreleased. This section
 records the work committed on `main`, from the initial `LICENSE` commit

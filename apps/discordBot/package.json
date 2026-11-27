@@ -12,12 +12,12 @@
     "docker:start": "docker run -d --name veyra-discord-bot --env-file .env veyra-discord-bot"
   },
   "dependencies": {
-    "discord.js": "^14.28.1",
-    "dotenv": "^18.0.10",
+    "discord.js": "14.28.1",
+    "dotenv": "18.0.10",
     "shared": "workspace:*",
     "database": "workspace:*"
   },
   "devDependencies": {
-    "tsx": "^4.23.15"
+    "tsx": "4.23.15"
   }
 }
