@@ -36,3 +36,15 @@ Veyra is an early-stage Discord-bot distribution platform. `README.md` and `ROAD
 - `docker-compose.yaml` needs root `.env`; `apps/site/src/app/api/health/route.ts` is the site healthcheck target. The nginx `map` defining `$connection_upgrade` is active (the HTTPS block is still commented, so the `ssl/` files are not read yet); the bot has no healthcheck because it exposes no HTTP server. Port 443 is published but has no listener until HTTPS is enabled.
 - Catalog bots are never added via PR (submit through the website); open an issue before large core changes — see `CONTRIBUTING.md`.
 - Convention (`docs/development.md`): English comments/docs; JSDoc on every exported function, class, type, enum and reusable helper, `///` on Prisma models; inline comments only for non-obvious logic. `.sql` migrations are exempt.
+
+## Versioning
+
+- After every change or operation that touches code, the agent must inspect the diff (`git diff`, plus `git diff --staged` if relevant) and bump the `version` field in the `package.json` of the package or app it worked on: `apps/discordBot` (`discord-bot`), `apps/site`, `shared`, `database`. Touch the root `package.json` only for root-level changes (tooling, CI, lint/test config, workspace config).
+- Use semver, decided from the diff:
+  - **patch**: bug fixes, internal refactors, dependency or config tweaks with no behavior change.
+  - **minor**: new backwards-compatible features (new command, event, route, exported function, optional env var, additive Prisma change).
+  - **major**: breaking changes (removed or renamed exports, required env var added or renamed, destructive Prisma schema change, incompatible `veyra.json` / `schemas/bot-metadata.schema.json` change).
+- Compare against the version at `HEAD` (or `main`), not against the working tree: bump at most once per task, even if the work involves several edits. If the version is already bumped by the current uncommitted changes, raise it again only if the diff now warrants a higher level (e.g. patch → minor).
+- Do not bump for changes that do not affect the package: docs-only (`docs/`, `*.md`), tests under root `tests/`, comments/formatting. If several packages are changed, bump each one according to its own diff.
+- If a changed package is consumed by another workspace package (e.g. `shared` or `database`), check that the dependents' ranges still resolve (`workspace:*` needs no edit). Keep the lockfile consistent (`pnpm install`), since CI uses `--frozen-lockfile`.
+- Report the bump in the final summary (e.g. `shared: 1.2.0 → 1.3.0 (minor: new exported helper)`).

@@ -77,22 +77,22 @@ registration route, NextAuth catch-all route and auth service (solid edges).
 3. Each imported module is validated by the matching loader and either stored in one
    of the four `dsClient` collections (`commands`, `buttons`, `menus`, `modals`) or,
    for events, subscribed with `client.on` / `client.once`. Invalid modules are logged
-   and skipped rather than crashing the process.
-4. `dsClient.login(ENV.token)` connects to Discord. Failures (for example, a
+   and skipped rather than crashing the process. The `src/events/interactionCreate.ts`
+   module subscribes the central dispatcher to incoming interactions.
+4. `registerCommands()` publishes the JSON of the loaded slash commands through
+   Discord's REST API. A failure is logged and does not block the gateway login.
+5. `dsClient.login(ENV.token)` connects to Discord. Failures (for example, a
    disabled privileged intent) are logged by the boot `try`/`catch`; the process is
    not rethrown.
-5. `SIGINT` and `SIGTERM` call `shutdown()`, which destroys the shared client.
+6. `SIGINT` and `SIGTERM` call `shutdown()`, which destroys the shared client.
    `SIGTERM` also sets `process.exitCode = 1`.
 
-Two important limits of the current skeleton:
-
-- The interaction directories (`src/commands`, `src/events`, and
-  `src/handlers/{buttons,menus,modals}`) do not exist in the repository. On a fresh
-  boot the loader logs a warning for each missing path and reports zero loaded
-  modules.
-- There is no `interactionCreate` listener and no REST application-command
-  registration. Loaded handlers are only stored in in-memory collections; they never
-  reach Discord until a dispatcher and registration step are added.
+One limit remains in the current skeleton: the interaction directories
+(`src/commands` and `src/handlers/{buttons,menus,modals}`) do not exist in the
+repository, so a fresh boot warns about those four paths and loads no user-facing
+handlers. The event directory now exists with the dispatcher bridge, and the
+dispatcher plus REST registration mean any module added to those directories is
+reachable from Discord.
 
 ## Website runtime flow
 
@@ -104,11 +104,15 @@ from shared components in `src/components/` and the path constants in
 `src/lib/routes.ts`. The forms validate locally; the sign-in form offers the
 existing credentials login plus "Continue with GitHub/Google/Discord" buttons that
 start a NextAuth redirect to `/api/auth/callback/<provider>` and return to `/`.
-`/signin` also renders generic messages for `?error=` codes. `src/lib/authConfig.ts`
-owns the server-side provider registration, scopes and session policy; the
-`[...nextauth]` route wires it to the Prisma adapter. `src/app/api/health/route.ts`
-returns `Response.json({ ok: true })` and is used by the compose healthcheck for
-the `site` service.
+`/signin` also renders generic messages for `?error=` codes. Two more account
+screens exist: `/signout` calls `signOut()` from `next-auth/react`, and `/account`
+lists the user's linked OAuth providers and lets them unlink one through
+`/api/account/providers`, which identifies the user from the JWT cookie and
+protects the last sign-in method. `src/lib/authConfig.ts` owns the server-side
+provider registration, scopes and session policy; the `[...nextauth]` route wires
+it to the Prisma adapter. `src/app/api/health/route.ts` returns
+`Response.json({ ok: true })` and is used by the compose healthcheck for the
+`site` service.
 
 The Next.js configuration enables `cacheComponents`, `partialPrefetching`, and a
 Turbopack rule that processes `*.css` with `@tailwindcss/turbopack`, excluding

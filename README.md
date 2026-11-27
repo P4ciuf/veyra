@@ -35,10 +35,10 @@ The experience is designed to be **consistent** between the website and the Disc
 
 ## Current implementation status
 
-Veyra is in early development: this document describes the **target product**, and most feature sections below are the plan, not current behavior. Account registration and sign-in are the exception — they are implemented in `apps/site`. What exists today:
+Veyra is in early development: this document describes the **target product**, and most feature sections below are the plan, not current behavior. Account features are the exception — registration, sign-in, sign-out and linked-provider settings are implemented in `apps/site`. What exists today:
 
-- **`apps/discordBot`** — the official bot skeleton: environment validation, auto-loading of interaction modules (commands, events, buttons, menus, modals) and Discord login. Loaded handlers are stored on the client, but no `interactionCreate` dispatcher or REST command registration exists yet, and there is no distribution flow.
-- **`apps/site`** — a Next.js 16 app with a placeholder landing page, a `/api/health` endpoint used by the compose healthcheck, and account screens at `/register` and `/signin` backed by `/api/auth/register` and a NextAuth catch-all route (email/password plus GitHub, Google and Discord OAuth).
+- **`apps/discordBot`** — the official bot skeleton: environment validation, auto-loading of interaction modules (commands, events, buttons, menus, modals), REST registration of loaded slash commands, an `interactionCreate` dispatcher that routes commands, buttons, menus and modals, and Discord login. There is no distribution flow yet.
+- **`apps/site`** — a Next.js 16 app with a placeholder landing page, a `/api/health` endpoint used by the compose healthcheck, account screens at `/register`, `/signin`, `/signout` and `/account`, and API routes for registration, NextAuth and linked-provider management (email/password plus GitHub, Google and Discord OAuth).
 - **`shared`** — workspace package with the logging facade used by the bot.
 - **`database`** — Prisma 7 data layer with the PostgreSQL driver adapter and a lazy `prisma` singleton; imported by the site's registration and auth routes. The bot declares it as a dependency but does not import it yet.
 - **`docs/` and `schemas/`** — project documentation, the [Veyra Bot Metadata Specification](./docs/specifications/bot-metadata.md), and the official [`veyra.json` JSON Schema](./schemas/bot-metadata.schema.json).

@@ -5,6 +5,33 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- 2026-11-27 — Data model: `BotVersion` gives bots independent, immutable release
+  history while `Bot.version` stays as a compatibility mirror; `Distribution`
+  records generated packages per user with a 72-hour expiry and no persisted
+  environment values or signed URLs. Added the additive migration
+  `20261127130000_add_distributions_and_bot_versions` and contract tests.
+- 2026-11-27 — Discord bot: `dispatchInteraction` routes commands, buttons, select
+  menus and modals (including predicate `customId` values), the
+  `interactionCreate` event module subscribes it, and `registerCommands` publishes
+  the loaded slash commands through Discord's REST API before login.
+- 2026-11-27 — Site account flows: `/signout` page with a `signOut()` button, and
+  `/account` page with linked-provider review/unlink through the authenticated
+  `GET`/`DELETE /api/account/providers` endpoints, guarded against removing the
+  last sign-in method.
+
+### Changed
+
+- 2026-11-27 — CI now pins pnpm 12.23.0, matching `devEngines` and both Dockerfiles.
+- 2026-11-27 — Package versions: `database` 0.2.0 → 0.3.0, `discord-bot` 0.1.0 →
+  0.2.0 and `site` 0.2.0 → 0.3.0 (new backwards-compatible models, modules and routes).
+- 2026-11-27 — `ROADMAP.md`, `README.md` and `docs/` now describe the implemented
+  data model, bot dispatcher, account settings and CI pin; deployment to Discord
+  and live OAuth verification remain explicitly blocked.
+
 ## [v0.2.0]
 
 ### Added

@@ -18,8 +18,10 @@ The module has no exports. Its side effects run at import time:
 - If `ENV.clientId` or `ENV.token` is falsy, it logs `Client ID or Token not found`,
   starts `shutdown()` without awaiting it, and calls `process.exit(1)`.
 - Otherwise an async IIFE calls `await new Loaders().LoadAll()`, then
-  `await dsClient.login(ENV.token)`, then logs the logged-in username. Any thrown
-  error is logged as `Bot initialization error: ...` and swallowed.
+  `await registerCommands()`, then `await dsClient.login(ENV.token)`, then logs the
+  logged-in username. Any thrown error is logged as `Bot initialization error: ...`
+  and swallowed; a failed REST registration logs its own error and does not block
+  login because `registerCommands()` resolves to `false` instead of throwing.
 - `SIGINT` logs the signal and awaits `shutdown()`.
 - `SIGTERM` logs the signal, awaits `shutdown()`, and sets `process.exitCode = 1`.
 
@@ -122,8 +124,44 @@ Additional details worth knowing when writing a module:
   gateway argument is forwarded unchanged to `execute`.
 - A function-valued menu `customId` is keyed by `Function.name` (or `"dynamic"` for
   an anonymous function); a function-valued modal `customId` is keyed by its full
-  source text. Dynamic matching against a live interaction is not implemented.
+  source text. The dispatcher still evaluates the original predicate stored on
+  the handler, so these modules are reachable at runtime.
 - The `messageCommands` counter exists but is never incremented by any loader.
+
+### `src/core/dispatcher.ts` — `dispatchInteraction()`
+
+```ts
+export async function dispatchInteraction(interaction: Interaction): Promise<void>;
+```
+
+Routes one `interactionCreate` payload to the loaded handler. Slash commands are
+looked up by `commandName`; buttons, select menus and modals by `customId`, first
+as a static collection key and then by evaluating any predicate found as a key
+or on the handler object. Other interaction types are ignored. A missing handler
+produces a `No ... handler registered for: ...` warning; a rejected handler is
+logged as `Interaction handler failed: ...` and never propagated to the event
+listener. The dispatcher depends on the registries on `dsClient`, so it must run
+after `LoadAll()`.
+
+### `src/core/registerCommands.ts` — `registerCommands()`
+
+```ts
+export async function registerCommands(): Promise<boolean>;
+```
+
+Builds the JSON of every loaded command with `data.toJSON()` and calls
+`REST.put(Routes.applicationCommands(ENV.clientId), { body })` using
+`ENV.token`. The full global command set is replaced, so removed commands are
+also cleaned up. Returns `true` on success; missing credentials or a rejected
+REST call are logged through the shared logger and return `false`. No new
+dependency is needed: `REST` and `Routes` come from the existing `discord.js`.
+
+### `src/events/interactionCreate.ts`
+
+A default-exported `Event` module named `interactionCreate`. The loader discovers
+it in `src/events` and subscribes its `execute` with `client.on`. It checks the
+gateway argument structurally and forwards it to `dispatchInteraction`; it does
+not implement any interaction logic itself.
 
 ### `src/core/shutdown.ts` — `shutdown()`
 
@@ -138,9 +176,9 @@ initialization errors.
 
 ### `src/types/interactions.ts` — interaction contracts
 
-These interfaces describe the shape each loader accepts. `execute` is awaited by a
-future dispatcher where noted; the loader itself does not invoke handlers except for
-events, which are subscribed directly.
+These interfaces describe the shape each loader accepts. `execute` is awaited by
+`dispatchInteraction`; the loader itself does not invoke handlers except for events,
+which are subscribed directly.
 
 ```ts
 interface Command {
@@ -295,12 +333,56 @@ export default function RegisterPage();
 ```
 
 Server components that own browser metadata and mount the corresponding client
-form. `/signin` matches the `pages.signIn` (and `pages.error`) value in the NextAuth
-handler; `/register` follows the same convention because NextAuth has no
-registration page setting. The sign-in page wraps the form in `<Suspense>` because
-the client form reads `?error=` with `useSearchParams`; neither page implements
-authentication itself. The sign-in form calls `signIn` from `next-auth/react` for
-both credentials and OAuth, and the registration form posts to `/api/auth/register`.
+form. `/signin` matches `pages.signIn` and `pages.error` in `lib/authConfig.ts`;
+`/register` follows the same convention because NextAuth has no registration page
+setting. The sign-in page wraps the form in `<Suspense>` because the client form
+reads `?error=` with `useSearchParams`; neither page implements authentication
+itself. The sign-in form calls `signIn` from `next-auth/react` for both credentials
+and OAuth, and the registration form posts to `/api/auth/register`.
+
+### `src/app/signout/page.tsx` and `src/app/account/page.tsx`
+
+Server components mounting the client controls `SignOutForm` and
+`AccountProviders` inside `AuthShell`. `/signout` is the page configured as
+`pages.signOut`; its button calls `signOut({ callbackUrl: "/", redirect: true })`
+and exposes a locked state plus an error alert if the POST fails. `/account`
+manages the OAuth identities linked to the current user: it fetches the list from
+`/api/account/providers` on mount and offers an unlink button per registered
+provider. Neither page reads session data during server rendering.
+
+### `src/services/accountProviders.ts`
+
+```ts
+export type UnlinkOutcome =
+  | "unlinked"
+  | "invalid-provider"
+  | "not-linked"
+  | "unknown-user"
+  | "last-sign-in-method";
+export async function listLinkedProviders(userId: string): Promise<OAuthProviderId[]>;
+export async function unlinkProvider(userId: string, provider: string): Promise<UnlinkOutcome>;
+```
+
+`listLinkedProviders` filters `Account.provider` values through `isOAuthProviderId`
+and returns them in the order used by the sign-in screen, ignoring ids from an old
+configuration. `unlinkProvider` rejects unregistered ids before any query, checks
+that the user row and the link exist, and refuses to remove the last sign-in
+method of a passwordless user. Deletion uses `deleteMany` on `(userId, provider)`;
+a zero count is reported as `not-linked`. `User.discordId` is intentionally left
+untouched because other models reference it.
+
+### `src/app/api/account/providers/route.ts`
+
+```ts
+export async function GET(req: NextRequest): Promise<NextResponse>;
+export async function DELETE(req: NextRequest): Promise<NextResponse>;
+```
+
+Both handlers identify the user from `getToken({ req, secret, secureCookie })`, so
+the id comes from the signed JWT rather than the request. Missing `NEXTAUTH_SECRET`
+returns 500, no session returns 401. `DELETE` validates a `{ provider }` body and
+maps the service outcomes to 200 (with the remaining providers), 400, 404, 409 and
+401; unexpected failures are logged and return 500.
 
 ### `src/components/authShell.tsx`, `formField.tsx`, `signInForm.tsx`, `registerForm.tsx`
 
@@ -338,8 +420,8 @@ export function createAuthAdapter(base: Adapter): Adapter;
 ```
 
 `buildAuthOptions` registers GitHub, Google, Discord and Credentials, sets JWT
-sessions, maps `/signin` to `signIn`, `signOut` and `error`, and derives `Secure`
-cookies from `NEXTAUTH_URL`. It leaves `allowDangerousEmailAccountLinking`
+sessions, maps `pages.signIn` and `pages.error` to `/signin` and `pages.signOut`
+to `/signout`, and derives `Secure` cookies from `NEXTAUTH_URL`. It leaves `allowDangerousEmailAccountLinking`
 disabled, so no account is taken over from an unverified email match. Its Discord
 provider maps the profile id into `discordId`, and its `signIn` event passes that
 id to `persistDiscordId` after every Discord sign-in (new, returning or explicitly
@@ -389,8 +471,9 @@ defined in `lib/authConfig.ts`.
 ### `src/lib/routes.ts` and `src/lib/authForm.ts`
 
 `ROUTES` centralises the frontend paths (`/signin`, `/signout`, `/register`,
-`/api/auth/register`, `/`); it mirrors the NextAuth `pages` block without importing
-the server-only auth handler. `validateSignIn`, `validateRegister` and
+`/api/auth/register`, `/`, `/account`, `/api/account/providers`); it mirrors the
+NextAuth `pages` block defined in `lib/authConfig.ts` without importing the
+server-only auth handler. `validateSignIn`, `validateRegister` and
 `hasFieldErrors` implement client-side checks that match the registration
 endpoint's limits (username 3–24, email format and 254-character cap, password
 8–128) plus password confirmation. No extra password policy is defined.
